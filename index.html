@@ -247,9 +247,9 @@
 
 <script>
 //==================== CONFIGURACIÓN DE FIREBASE ====================
-// Pega aquí el objeto "firebaseConfig" que te da la consola de Firebase.
+// Pega aquí el objeto que te da la consola de Firebase (entre las llaves).
 // Mientras esté vacío, la app guarda en el navegador (modo local).
-const firebaseConfig = {
+const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBQB6LAjY4LCBDLVSb57EoDd3kSFVE2c-Y",
   authDomain: "talleres-gastronomia.firebaseapp.com",
   projectId: "talleres-gastronomia",
@@ -428,8 +428,8 @@ const CLIENT_ID=Math.random().toString(36).slice(2,9);
 let lastWritten=null, pendingRemote=null;
 
 async function initFirebase(){
-  if(!FIREBASE_CONFIG || !FIREBASE_CONFIG.projectId) return false;
   try{
+    if(typeof FIREBASE_CONFIG==="undefined" || !FIREBASE_CONFIG || !FIREBASE_CONFIG.projectId) return false;
     const appMod=await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js");
     const fsMod =await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js");
     const app=appMod.initializeApp(FIREBASE_CONFIG);
@@ -437,7 +437,7 @@ async function initFirebase(){
     fb.fns=fsMod; fb.docRef=fsMod.doc(db,FIRE_COLLECTION,FIRE_DOC); fb.ready=true;
     storageMode="firebase";
     return true;
-  }catch(e){ console.error("Firebase no se pudo iniciar:",e); return false; }
+  }catch(e){ console.error("Firebase no se pudo iniciar:",e); fb.ready=false; return false; }
 }
 
 async function storageGet(){
@@ -915,8 +915,9 @@ function toast(msg){
 
 //==================== INIT ====================
 async function init(){
-  await initFirebase();
-  const loaded=await load();
+  let loaded=null;
+  try{ await initFirebase(); loaded=await load(); }
+  catch(e){ console.error("Inicio de almacenamiento falló:",e); }
   state = loaded || buildDefault();
   // re-secuenciar ids para evitar choques
   state.talleres.forEach(t=>t.items.forEach(it=>{if(!it.id)it.id=nid();}));
