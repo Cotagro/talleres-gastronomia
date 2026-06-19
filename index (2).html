@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estándar de Talleres · Gastronomía</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F6F3; --surface:#FFFFFF; --ink:#1A1D1A; --muted:#6E7268;
+    --line:#E4E2DB; --line-strong:#D2CFC6;
+    --accent:#115E59; --accent-soft:#E2EFEC; --accent-ink:#0B3D3A;
+    --ok:#15803D; --ok-soft:#E6F2EA;
+    --warn:#B45309; --warn-soft:#F7EDDD;
+    --bad:#B91C1C; --bad-soft:#F8E5E2;
+    --none:#9AA0A6; --none-soft:#EFEEEB;
+    --shadow:0 1px 2px rgba(20,25,20,.05),0 8px 24px rgba(20,25,20,.04);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif;font-size:14px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:"Space Grotesk",sans-serif;margin:0;letter-spacing:-.01em}
+  .mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
+  button{font-family:inherit;cursor:pointer}
+  input,select,textarea{font-family:inherit}
+
+  /* ---- top bar ---- */
+  header{
+    position:sticky;top:0;z-index:30;background:rgba(247,246,243,.88);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  }
+  .bar{max-width:1180px;margin:0 auto;padding:16px 22px;display:flex;
+    align-items:center;gap:18px;flex-wrap:wrap}
+  .brand{display:flex;flex-direction:column;gap:2px;margin-right:auto}
+  .eyebrow{font:600 11px/1 "Space Grotesk",sans-serif;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent)}
+  .brand h1{font-size:21px;font-weight:600}
+  .sede-in{border:none;background:transparent;font:inherit;color:var(--muted);
+    font-size:12px;padding:1px 0;width:min(260px,60vw)}
+  .sede-in:focus{outline:none;color:var(--ink)}
+  .global{display:flex;align-items:center;gap:14px}
+  .gstat{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+  .gstat b{font:600 19px/1 "Space Grotesk";}
+  .gstat span{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);
+    border-radius:9px;padding:8px 13px;font-weight:600;font-size:12.5px;transition:.12s}
+  .btn:hover{border-color:var(--ink)}
+  .btn.ghost{background:transparent}
+  .btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+
+  /* ---- view switch ---- */
+  .views{max-width:1180px;margin:0 auto;padding:0 22px;display:flex;gap:6px;
+    border-bottom:1px solid var(--line)}
+  .vtab{border:none;background:transparent;padding:13px 4px;margin-right:18px;
+    color:var(--muted);font-weight:600;font-size:13.5px;border-bottom:2px solid transparent;
+    margin-bottom:-1px}
+  .vtab.on{color:var(--ink);border-bottom-color:var(--accent)}
+
+  main{max-width:1180px;margin:0 auto;padding:22px}
+
+  /* ---- provisional banner ---- */
+  .note{display:flex;gap:12px;align-items:flex-start;background:var(--warn-soft);
+    border:1px solid #E9D5B4;border-radius:12px;padding:13px 15px;margin-bottom:20px;
+    font-size:13px;color:#6b4413}
+  .note b{color:#5a3a10}
+  .note .x{margin-left:auto;border:none;background:transparent;color:#9c7a3f;
+    font-size:17px;line-height:1;padding:0 2px}
+  .note svg{flex:0 0 18px;margin-top:1px}
+
+  /* ---- taller tabs ---- */
+  .ttabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;
+    scrollbar-width:thin}
+  .ttab{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);
+    border-radius:11px;padding:10px 14px;text-align:left;min-width:118px;transition:.12s}
+  .ttab:hover{border-color:var(--line-strong)}
+  .ttab.on{border-color:var(--ink);box-shadow:var(--shadow)}
+  .ttab .code{font:700 15px/1 "Space Grotesk";display:block}
+  .ttab .nm{font-size:11px;color:var(--muted);display:block;margin:3px 0 7px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+  .ttab .mini{height:4px;border-radius:3px;background:var(--none-soft);overflow:hidden}
+  .ttab .mini i{display:block;height:100%;background:var(--ok)}
+  .ttab .pct{font:600 10.5px/1 "JetBrains Mono";color:var(--muted);margin-top:5px;display:block}
+
+  /* ---- taller panel ---- */
+  .thead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+  .thead .tt{display:flex;flex-direction:column;gap:3px;margin-right:auto}
+  .thead .tt .tcode{font:700 13px/1 "Space Grotesk";color:var(--accent);letter-spacing:.04em}
+  .nm-in{border:none;background:transparent;font:600 24px/1.1 "Space Grotesk";color:var(--ink);
+    padding:2px 0;width:min(420px,80vw);border-bottom:1px dashed transparent}
+  .nm-in:hover{border-bottom-color:var(--line-strong)}
+  .nm-in:focus{outline:none;border-bottom-color:var(--accent)}
+
+  .kpis{display:flex;gap:10px;flex-wrap:wrap}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+    padding:9px 14px;min-width:92px}
+  .kpi b{font:600 20px/1 "Space Grotesk";display:block}
+  .kpi span{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .kpi.ok b{color:var(--ok)} .kpi.bad b{color:var(--bad)} .kpi.none b{color:var(--none)}
+
+  .meter{height:8px;border-radius:5px;background:var(--none-soft);overflow:hidden;margin:16px 0 6px}
+  .meter i{display:block;height:100%;background:var(--ok);transition:width .35s}
+  .meterlbl{font-size:11.5px;color:var(--muted);margin-bottom:18px}
+
+  /* ---- table ---- */
+  .tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;box-shadow:var(--shadow)}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:720px}
+  thead th{font:600 10.5px/1 "Space Grotesk";letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);
+    background:#FBFAF7;position:sticky;top:0}
+  th.num,td.num{text-align:center;width:74px}
+  th.act,td.act{width:96px}
+  td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#FCFBF8}
+  .eq{font-weight:600;font-size:13.5px}
+  .spectoggle{border:none;background:transparent;color:var(--accent);font-size:11.5px;
+    font-weight:600;padding:3px 0;margin-top:2px}
+  .spec{font-size:12px;color:var(--muted);margin-top:6px;max-width:540px;display:none;
+    white-space:pre-wrap}
+  .spec.show{display:block}
+  td.num .mono{font-size:14px}
+  .std{color:var(--muted)}
+  .actin{width:62px;text-align:center;border:1px solid var(--line-strong);border-radius:8px;
+    padding:6px 4px;font:600 14px "JetBrains Mono";color:var(--ink);background:var(--surface)}
+  .actin:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .actin.empty{border-style:dashed;color:var(--none)}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+    padding:4px 10px;font:600 11.5px/1 "Inter";white-space:nowrap}
+  .badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+  .b-ok{background:var(--ok-soft);color:var(--ok)}
+  .b-warn{background:var(--warn-soft);color:var(--warn)}
+  .b-bad{background:var(--bad-soft);color:var(--bad)}
+  .b-none{background:var(--none-soft);color:#5f6368}
+  .b-exc{background:var(--accent-soft);color:var(--accent-ink)}
+
+  .rowact{display:flex;gap:4px;justify-content:flex-end}
+  .iconbtn{border:1px solid transparent;background:transparent;color:var(--muted);
+    border-radius:7px;padding:5px;line-height:0}
+  .iconbtn:hover{background:var(--bg);color:var(--ink)}
+  .iconbtn.del:hover{color:var(--bad)}
+  .movesel{border:1px solid var(--line);border-radius:7px;font-size:11px;padding:4px 6px;
+    color:var(--muted);background:var(--surface)}
+
+  .tfoot{padding:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#FBFAF7;
+    border-top:1px solid var(--line)}
+  .addbtn{border:1px dashed var(--line-strong);background:transparent;border-radius:9px;
+    padding:8px 13px;font-weight:600;font-size:12.5px;color:var(--accent)}
+  .addbtn:hover{border-color:var(--accent);background:var(--accent-soft)}
+
+  /* add form */
+  .addform{display:none;gap:9px;flex-wrap:wrap;align-items:flex-start;width:100%}
+  .addform.show{display:flex}
+  .addform input,.addform textarea{border:1px solid var(--line-strong);border-radius:9px;
+    padding:8px 10px;font-size:13px}
+  .addform .f-eq{flex:1 1 200px}
+  .addform .f-spec{flex:2 1 280px;resize:vertical;min-height:38px;font-size:12px}
+  .addform .f-std{width:78px;text-align:center;font-family:"JetBrains Mono"}
+
+  .empty{padding:48px 22px;text-align:center;color:var(--muted)}
+  .empty h3{font-size:16px;color:var(--ink);margin-bottom:6px}
+
+  /* ---- investment plan ---- */
+  .planhead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .planhead h2{font-size:24px;margin-right:auto}
+  .plangrp{margin-bottom:22px}
+  .plangrp h3{font-size:15px;display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .plangrp h3 .tag{font:700 11px/1 "Space Grotesk";color:var(--accent);
+    background:var(--accent-soft);border-radius:6px;padding:4px 7px}
+  .plangrp h3 small{font-weight:500;color:var(--muted);font-family:"Inter"}
+  .plantable{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .plantable table{min-width:560px}
+  .pq{font:700 14px "JetBrains Mono";color:var(--bad)}
+  .planok{background:var(--ok-soft);border:1px solid #BFE0CB;border-radius:12px;
+    padding:22px;text-align:center;color:var(--ok);font-weight:600}
+  .pendwarn{font-size:12px;color:var(--warn);margin-top:5px}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;
+    font-weight:500;opacity:0;transition:.25s;z-index:60;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media print{
+    header,.views,.ttabs,.note,.tfoot,.rowact,.btn{display:none!important}
+    body{background:#fff}
+    .plantable,.tablewrap{box-shadow:none}
+  }
+  @media (max-width:560px){
+    .bar{padding:13px 15px} main{padding:15px}
+    .brand h1{font-size:18px} .nm-in{font-size:20px}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">
+      <span class="eyebrow">Estándar de sede · Gastronomía</span>
+      <h1>Cumplimiento de equipamiento por taller</h1>
+      <input class="sede-in" id="sedeIn" placeholder="Escribe el nombre de la sede…">
+    </div>
+    <div class="global">
+      <div class="gstat"><b class="mono" id="gPct">—</b><span>Cumplimiento</span></div>
+      <div class="gstat"><b class="mono" id="gFalt" style="color:var(--bad)">—</b><span>Unid. faltantes</span></div>
+      <button class="btn ghost danger" id="resetBtn">Reiniciar</button>
+    </div>
+  </div>
+  <div class="views">
+    <button class="vtab on" data-view="talleres" id="vTalleres">Talleres</button>
+    <button class="vtab" data-view="plan" id="vPlan">Plan de inversión</button>
+    <button class="vtab" data-view="reporte" id="vReporte">Reporte</button>
+  </div>
+</header>
+
+<main>
+  <div class="note" id="note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#b07a2a" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z"/></svg>
+    <div><b>Asignación de talleres provisional.</b> La lista original no traía la columna de taller, así que los equipos se agruparon por función. Verifica cada sala y mueve, edita o elimina lo que no corresponda. El <b>503</b> está vacío a la espera de tus datos. Todo lo que ingreses se guarda automáticamente.</div>
+    <button class="x" id="noteX" title="Ocultar">×</button>
+  </div>
+
+  <div id="tallerView">
+    <div class="ttabs" id="ttabs"></div>
+    <div id="panel"></div>
+  </div>
+
+  <div id="planView" style="display:none"></div>
+  <div id="reportView" style="display:none"></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+//==================== SEED DATA (estándar provisional por función) ====================
+// std = cantidad del estándar | act = cantidad actual (null = sin registrar)
+const TALLER_DEFS = [
+  {code:"500A", nombre:"Cocina Caliente"},
+  {code:"500B", nombre:"Cocina de Producción / Autoservicio"},
+  {code:"501",  nombre:"Comedor Didáctico"},
+  {code:"502",  nombre:"Cocina Fría / Sala de Frío"},
+  {code:"503",  nombre:"Por definir"},
+  {code:"504",  nombre:"Pastelería"},
+  {code:"505",  nombre:"Panadería"},
+];
+
+const ABL="Maxi 25, kit de instalación y sal. Unidad ablandadora de agua, volumétrica estadística doble alternado, con válvula de 1 1/2\" electrónica de control. Microprocesador y contador emisor de impulsos. Regulador de dureza residual incorporado. Resina catiónica calidad alimentaria. Caudal desde 6 m³/hr, conexión 220 volt.";
+const CAMP_C="Campana de extracción central. Dimensiones según plano arquitectónico. Plancha de 1,0 mm de espesor, iluminación LED, acero inoxidable AISI 304, filtros tipo laberinto. No incluye extracción.";
+const CAMP_M="Campana de extracción mural. Dimensiones según plano arquitectónico. Plancha de 1,0 mm de espesor, iluminación LED, acero inoxidable AISI 304, filtros tipo laberinto. No incluye extracción.";
+const COC_GAS="Cocina a gas de 4 quemadores abiertos con válvula de seguridad y termopares, piloto de encendido con protección, parrillas y quemadores de fundición, bandeja recoge grasas extraíble. 3 quemadores desde 5 kW y 1 quemador desde 6 kW.";
+const CONG="1 puerta vidrio transparente, acero inox. Congelación con circulación de aire forzado, evaporador de tubos de cobre y aletas de aluminio. Módulo electrónico digital, deshielo automático, parrillas regulables de barras de acero.";
+const REFRI="1 puerta vidrio transparente. Refrigeración con circulación de aire forzado, evaporador de tubos de cobre y aletas de aluminio. Módulo electrónico digital, deshielo automático, parrillas regulables de barras de acero.";
+const ESTANTE="Gabinete cerrado, mural. Tapa superior, puertas, frente y costados de acero inoxidable AISI 304L. Puerta abatible con bisagras tipo piano, porta candado, bandeja superior e inferior de acero inoxidable.";
+const ESPECIERO="Acero inoxidable AISI 304L. Dos bandejas fijas tipo rejilla con borde perimetral, barra de empuje, juego de ruedas con freno. Altura 1,15 m, fondo 50 cm, frente 60 cm.";
+const M_APOYO="Construcción interior y exterior de acero inoxidable 18/10. Estante intermedio y refuerzo central, correbandejas incorporado. 800×700×850. Incluye ruedas.";
+const M_DESC="Mesón de desconche mural. Acero inoxidable AISI 304L. Perforación sobre cubierta de 20 cm de diámetro con protección de goma, refuerzo bajo cubierta, respaldo de 10 cm en una sola pieza.";
+const M_TRAB="Mesón de trabajo central con ruedas, 90×60×85. Cubierta 1,2 mm con refuerzo inferior, repisa inferior 1,0 mm. 4 ruedas nylon-inox giratorias Ø80 mm con freno. Acero inoxidable AISI 304.";
+const M_CENT="Central, línea hotel 140×60×85, acero inoxidable AISI 304L. Refuerzo bajo cubierta, con ruedas y freno, guías para bandejas full size más bandeja parcial inferior. Rejillas porta latas de horno bajo mesón en un lateral (8 bandejas).";
+const MICRO="Horno microondas industrial. Construcción interior y exterior en acero inoxidable. Temporizador digital, descongelación, señal sonora de paro, plato cerámico fijo. 25 lts, 220 V 50 Hz, ~1.100 W.";
+const PANOL="Mueble cerrado en acero inoxidable, puertas enrejadas en barra de 3 mm. Tres niveles de bandejas fijas en plancha perforada. Juego de ruedas de 5\", dos con freno. Incluye porta candado.";
+const HIELO="Fabricadora de hielo, producción 31 kg/día, tanque 15 kg. Conexión 220 volt. Bajo el mueble de bar.";
+const LAVAM="Taza redonda y llave monomando / accionador rodilla (ss) (mínimo 2) con agua caliente y fría. Acero inoxidable.";
+const ABAT="Abatidor mixto, para bandejas GN y pasteleras 60×40, capacidad 5 bandejas. Incluye sonda de temperatura, conexión 220 volt. Compatible con horno mixto 6 GN 1/1 como base.";
+const LAV1="1 taza y 1 secador (ss) según dimensiones del bar (empotrado en el mueble de bar) con llave agua fría y caliente.";
+const LAV2="Acero inoxidable, respaldo 10 cm en una pieza. Taza estampada 50×40×25 cm y llave combinada agua fría/caliente. 2 tazas y 2 secadores (ss), 1 llave tipo cisne.";
+const LAV3="Acero inoxidable, respaldo 10 cm en una pieza. Taza estampada 50×40×25 cm y llave combinada agua fría/caliente. 2 tazas y 1 secador (ss), 1 llave con pre-wash.";
+const LAV4="Acero inoxidable AISI 304L. Respaldo 10 cm en una sola pieza con la cubierta. Taza estampada 50×40×30 cm y llave tipo cisne. Desagüe inox. Patas en perfil tubular redondo Ø41 mm.";
+const LAV5="Acero inoxidable AISI 304L. Respaldo 10 cm en una sola pieza con la cubierta. Taza estampada 50×40×30 cm y llave PRE-WASH. 2 tazas y 2 secadores (ss). Desagüe inox.";
+
+function lavSet(){return [
+  ["Lavadero",LAV1,1],["Lavadero",LAV2,1],["Lavadero",LAV3,1],["Lavadero",LAV4,1],["Lavadero",LAV5,1]
+];}
+
+// Núcleo de cocina caliente compartido por 500A y 500B
+function hotCore(){return [
+  ["Abatidor de frío",ABAT,1],
+  ["Campana cocina (central)",CAMP_C,1],
+  ["Campana hornos (mural)",CAMP_M,1],
+  ["Carro especiero",ESPECIERO,1],
+  ["Congelador visicooler / talleres",CONG,2],
+  ["Estante para útiles de aseo",ESTANTE,1],
+  ...lavSet(),
+  ["Lavamanos mural",LAVAM,2],
+  ["Máquina fabricadora de hielo",HIELO,1],
+  ["Mesón de apoyo",M_APOYO,1],
+  ["Mesón de desconche",M_DESC,2],
+  ["Mesón de trabajo",M_TRAB,2],
+  ["Mesón de trabajo central",M_CENT,10],
+  ["Microondas profesional",MICRO,1],
+  ["Pañol móvil",PANOL,1],
+  ["Refrigerador visicooler / talleres",REFRI,2],
+];}
+
+const SEED = {
+  "500A":[
+    ...hotCore(),
+    ["Aire acondicionado","Según dimensiones del espacio físico, 36000 BTU.",1],
+    ["Cocina industrial a gas",COC_GAS,1],
+    ["Batidora profesional","Tipo KitchenAid, bowl acero inoxidable. 220 V, estructura fundición. 5 velocidades, incluye paleta, globo y gancho. Cabezal elevable y bowl extraíble. 250 W, 4.5 lts.",4],
+    ["Brazo triturador","Triturador de alimentos ergonómico, ángulo de inclinación idóneo, campana protectora de cuchillas con rosca. Acero inoxidable.",2],
+    ["Cocina de inducción","Cocina de inducción de 1 plato, color negro.",4],
+    ["Cortadora de fiambres","Cortadora de fiambres, mod. Palladio 330 EVO top, 220/50 Hz.",1],
+    ["Extracción basura u olores fuertes","Sistema de extracción para sala de basura.",1],
+    ["Licuadora industrial","Eléctrica, capacidad 2 litros, jarro de acero inox.",1],
+    ["Licuadora profesional","Tipo Hamilton Beach. Heavy duty, motor 1,5 HP, 2 velocidades, vaso de acero inox 2 lts, caja de motor en policarbonato, tapa transparente removible. 220 V 50 Hz.",1],
+    ["Procesadora de alimentos","KitchenAid, 220-240 V 50/60 Hz. Motor 300 W. Velocidad 900–1.750 rpm. Peso 7.8 kg.",1],
+    ["Robot coupe","Procesador de alimentos, base metálica. Bloque motor de velocidad variable, cabezal universal y recipiente cutter desde 5 lts con cuchillas. Producción 150–450 kg/hr. Incluye discos para cortar.",1],
+    ["Selladora al vacío","Sobre mesón, vaciado desde 8 m³/hr, longitud de sellado 305 mm. Sellado por tiempo o sensor.",1],
+    ["Set de limpieza","Adosado al muro, con manguera retráctil.",1],
+    ["Armario térmico","Para despacho, acero inoxidable. Con ruedas, repisa doble con infrarrojo simple / calentador de platos.",1],
+    ["Balanza de piso","De piso, digital, capacidad máxima ~150 kg.",1],
+  ],
+  "500B":[
+    ...hotCore(),
+    ["Cocina industrial a gas",COC_GAS,2],
+    ["Accesorio plancha","Plancha churrasquera acanalada (para marcar), acero laminado 12 mm, borde perimetral y canaleta recolectora de jugos con despiche. 82×66×12.5 cm.",1],
+    ["Anafe plancha parrilla","Anafe base a gas. Frente, costados, posterior, bastidores y patas nivelables en acero inox. Quemadores tubulares (QTI) con venturi y perforaciones tipo celosía.",1],
+    ["Baño maría (autoservicio)","Mueble baño maría seco 3 GN 1/1. Accesible por todos los lados, correbandejas en laterales. Calentamiento sin agua, resistencia blindada protegida. Cuba 200 mm. Termostato y termómetro analógico, 30–90 °C. 4 ruedas, 2 con freno. AISI 304 18/10.",1],
+    ["Carro bandejero autoservicio","Acero inox AISI 304L para 13 bandejas (46×73 cm) de horno ó 26 de autoservicio (46×33 cm). Correderas soldadas a pilares tubulares cuadrados.",1],
+    ["Carro porta cubiertos y bandejas","Módulo dispensador de cubiertos, pan y bandejas. 85×50×150 cm. Con ruedas y frenos, acero inoxidable.",1],
+    ["Freidora","Sobre mesón, dos depósitos. Termostática 60–195 °C, termostato de seguridad, resistencias blindadas. Capacidad 10 lts, 2 canastillos. 220 V 6 kW.",1],
+    ["Grilla-plancha","Anafe base a gas. Frente, costados, posterior y patas nivelables en acero inox. Quemadores tubulares (QTI) con venturi y perforaciones tipo celosía.",1],
+    ["Horno combinado","Horno combinado Rational con inyección de agua para vapor. Mínimo 5 bandejas 60×40, eléctrico 380 V/50 Hz trifásico.",1],
+    ["Salad Bar","Mueble con cuba refrigerada 3 GN 1/1, para exposición de alimentos. Estante inferior abierto. AISI 304 18/10 con aislamiento de poliuretano. Superficie de -4 a +4 °C, termostato electrónico digital, evaporación automática. 4 ruedas, 2 con freno. Correbandejas y estantería superior.",1],
+    ["Carro mercadería utilitario","Carro multiuso para transportar mercadería, con ruedas, porta rack apilable y manilla.",1],
+  ],
+  "501":[
+    ["Equipo de música","Parlante con conexión wifi a radios por internet, servicios de música y bluetooth. Ref. 9.7×43.4×18 cm.",1],
+    ["Máquina fabricadora de hielo",HIELO,1],
+    ["Mesas para cliente restaurant","Cuadradas de madera, cuatro patas laterales, 1 m × 1.10 m × 75 cm de alto.",5],
+    ["Molinillo de café","Recipiente granos 300 g, recipiente molido 200 g. Motor moledor 1400 W / 220 V.",1],
+    ["Mueble de bar","Mueble de granito, estructura a medida según sede, con puertas, lavadero, mesón de trabajo y espacio para máquinas y equipos del estándar.",1],
+    ["Mueble Gueridón","75×48×84,5 de alto, con ruedas y freno. Diseño según estándar.",5],
+    ["Mueble o aparador","Para vajilla, repisas con llaves (detrás del mueble de bar), puertas de vidrio, iluminado y cajones con ruedas. Modelo según estándar.",1],
+    ["Pantalla touch","Pantalla touch 23 pulgadas.",1],
+    ["Percolador","Cafetera percolador, 11 lts, ~60 tazas. Acero inox AISI 304 incl. colador interior. Switch de encendido/apagado.",1],
+    ["Pizarra plegable","Plegable, tipo cuadro, con dos puertas. 108×220 cm.",1],
+    ["Refrigerador para vinos","Con puerta transparente.",1],
+    ["Repisa para desconche","Repisa mural para cristalería, loza y cubiertos.",1],
+    ["Visicooler / Refrigeración bajo barra","Acero inox. Mesón refrigerado de dos puertas (ref. TRUE) adecuado al diseño de la barra.",1],
+  ],
+  "502":[
+    ["Ablandador de agua",ABL,1],
+    ["Ablandador de agua",ABL,2],
+    ["Máquina lavavajilla","Apertura frontal, para cestas 500×500, 220 volt, desde 40 rack/hr. Admite bandejas GN 1/1. Dosificador de detergente y abrillantador, pantalla de temperaturas. Incluye 1 rack de platos, 1 rack plano y 1 caja de cubiertos.",1],
+    ["Atril abatidor","Mueble de acero inoxidable (soporte para abatidor de temperatura, según dimensiones).",1],
+    ["Atril Horno combinado","Soporte horno combinado Rational.",1],
+    ["Carro conservador","UPCS 400 Cambro, alto 65, ancho 67.3, fondo 48.3, con ruedas. Mantenedor sous vide.",1],
+    ["Termocirculador sous-vide portátil","Circulador de inmersión Polyscience MX-CA12E MX (máx. 135 °C), 240 V 50 Hz.",2],
+    ["Visicooler / Congelación sala de frío","Armario de congelación por tiro forzado, acero inox, 4 puertas. Refrigerante R-404A. -18 °C, ambiente 32 °C. Control electrónico con visor digital, alarma de puertas. Capacidad mín. 1400 lts, potencia desde 1 kW. Incluye 6 parrillas GN 2/1.",3],
+    ["Visicooler / Refrigeración sala de frío","Armario de refrigeración por tiro forzado, acero inox, 4 puertas. Refrigerante R-404A. Control electrónico con visor digital, alarma de puertas. Capacidad mín. 1400 lts, potencia desde 1 kW. Incluye 6 parrillas GN 2/1.",3],
+  ],
+  "503":[],
+  "504":[
+    ["Ablandador de agua",ABL,3],
+    ["Ablandador de agua",ABL,4],
+    ["Máquina cafetera","Cafetera semiautomática de 2 grupos de erogación. Grifo de agua caliente, válvula vaporizadora con electrobomba, control electrónico de temperatura en caldera y de nivel de agua.",1],
+    ["Máquina lavavajilla bajo mesón","Acero inox AISI 304. Brazos de lavado/enjuague rotatorios en polímero reforzado. Filtro bomba en polipropileno y fibra de vidrio, puerta doble, manilla encajada ergonómica, brazos intercambiables. Microswitch de seguridad de puerta, consumo 2,8 lts/ciclo, termostop de enjuague 81–83 °C.",1],
+    ["Atril abatidor","Mueble de acero inoxidable (soporte para abatidor de temperatura, según dimensiones).",1],
+    ["Atril Horno Panadero - Pastelero","Mueble de acero inoxidable (soporte para horno panadero-pastelero).",1],
+    ["Atril máquina para helados","Mueble de acero inoxidable (soporte máquina para helados, según dimensiones).",1],
+    ["Batidora planetaria","Uso profesional, motor trifásico 380 volt. Bowl de acero inoxidable. Gancho amasador en espiral, paleta mezcladora y batidor de varillas.",1],
+    ["Bowl grageador","Bowl que se acopla a la KitchenAid, acero inox, bordes redondeados, incluye base inclinada.",3],
+    ["Compresor de aire","Compresor de aire móvil, 2 HP para pistola. Debe ajustarse a pistola de pastelería.",1],
+    ["Laminadora horizontal profesional","Laminadora STM5303, anchura de trabajo 500 mm. Rango de laminación 0.5–30 mm, cilindros Ø84 mm × 500 mm, salida 30 m/min. 2500×990×1300(H) mm. 400V/3/50Hz, 0,75 kW, 80 kg.",1],
+    ["Máquina para helados","Modelo referencial tipo Cattabriga MTM 20.",1],
+    ["Mesón refrigerado","Acero inoxidable. Trabajo 0 a +10 °C (objetivo +4 °C, rango +2 a +6 °C). 2 parrillas interiores por puerta, refrigerante R134a, descongelación automática, aire forzado. 500 W, 2,2 A, 220 V. 135×70×85 cm.",1],
+    ["Set de cuchillos Robot coupe","Pack de 8 discos Robot Coupe para mod. CL50.",1],
+    ["Thermomix","Modelo TM5. Material plástico apto contacto con alimentos. Vaso con sistema de calentamiento y sensor de temperatura integrada.",4],
+  ],
+  "505":[
+    ["Amasadora","Amasadora de gancho espiral 20 lt, 18 kg masa al 60%, 12 kg harina. Dos velocidades con temporizador, para masas duras. Estructura esmaltada antiarañazo. Partes en contacto con alimentos en acero inox (cuba y espiral). Rejilla de protección inox.",1],
+    ["Cámara fermentadora panificación","Estufa de fermentación para horno convector panadero, capacidad 20 bandejas 60×40, 220 volt. Incluye resistencia para generar vapor y termostato de temperatura.",1],
+    ["Horno Panadero - Pastelero","Horno Combi UNOX mod. Plus XEBC-06EU-EPR, línea Bakertop, 6 bandejas 60×40 cm.",1],
+    ["Sobadora","Acero inoxidable o esmaltado, capacidad mínima 5 kg, rodillo en acero pulido, deslizadores inox, monofásico o trifásico. Sobremesón.",1],
+    ["Lámpara infrarroja","Para trabajo de azúcar. Lámpara con distintas potencias que mantiene el caramelo blando; la mesa también da calor. Mínimo 500 W.",1],
+  ],
+};
+
+//==================== STATE ====================
+const STORE_KEY="estandar_talleres_v1";
+let state=null, current="500A", view="talleres", noteHidden=false;
+let _id=0; const nid=()=>"i"+(++_id);
+let storageMode="memory";
+
+function buildDefault(){
+  return {
+    sede:"",
+    noteHidden:false,
+    talleres: TALLER_DEFS.map(d=>({
+      code:d.code, nombre:d.nombre,
+      items:(SEED[d.code]||[]).map(([eq,spec,std])=>({id:nid(),eq,spec,std,act:null}))
+    }))
+  };
+}
+
+//==================== PERSISTENCE ====================
+// Funciona en 3 entornos: almacenamiento de artefacto (window.storage),
+// navegador normal / GitHub Pages (localStorage), o solo memoria.
+async function storageGet(){
+  if(typeof window.storage!=="undefined" && window.storage){
+    storageMode="cloud";
+    try{ const r=await window.storage.get(STORE_KEY,false); return r&&r.value?r.value:null; }
+    catch(e){ return null; }
+  }
+  try{ const v=localStorage.getItem(STORE_KEY); storageMode="local"; return v; }catch(e){}
+  storageMode="memory"; return null;
+}
+async function storageSet(val){
+  if(typeof window.storage!=="undefined" && window.storage){
+    try{ await window.storage.set(STORE_KEY,val,false); return; }catch(e){}
+  }
+  try{ localStorage.setItem(STORE_KEY,val); }catch(e){}
+}
+let saveTimer=null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{ storageSet(JSON.stringify(state)); },300);
+}
+async function load(){
+  const raw=await storageGet();
+  if(raw){ try{ return JSON.parse(raw); }catch(e){} }
+  return null;
+}
+
+//==================== HELPERS ====================
+function tallerByCode(c){return state.talleres.find(t=>t.code===c);}
+function statusOf(it){
+  if(it.act===null||it.act==="") return {key:"none",label:"Sin registrar",cls:"b-none",gap:0};
+  const a=Number(it.act);
+  if(a>=it.std && a<=it.std) return {key:"ok",label:"Cumple",cls:"b-ok",gap:0};
+  if(a>it.std) return {key:"exc",label:"Excede +"+(a-it.std),cls:"b-exc",gap:0};
+  if(a<=0) return {key:"bad",label:"No hay",cls:"b-bad",gap:it.std};
+  return {key:"warn",label:"Faltan "+(it.std-a),cls:"b-warn",gap:it.std-a};
+}
+function tallerStats(t){
+  let cumple=0,pend=0,gap=0,conGap=0;
+  t.items.forEach(it=>{const s=statusOf(it);
+    if(s.key==="none")pend++; else if(s.gap===0)cumple++;
+    if(s.gap>0){gap+=s.gap;conGap++;}
+  });
+  const total=t.items.length;
+  const evaluados=total-pend;
+  const pct= evaluados? Math.round(cumple/evaluados*100) : (total?0:100);
+  return {total,cumple,pend,gap,conGap,evaluados,pct};
+}
+function globalStats(){
+  let gap=0, cumple=0, evaluados=0;
+  state.talleres.forEach(t=>{const s=tallerStats(t);gap+=s.gap;cumple+=s.cumple;evaluados+=s.evaluados;});
+  return {gap, pct: evaluados?Math.round(cumple/evaluados*100):0};
+}
+const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// catálogo de equipos conocidos para autocompletar al agregar
+function knownCatalog(){
+  const m=new Map();
+  Object.values(SEED).flat().forEach(([eq,spec])=>{ if(!m.has(eq)) m.set(eq,spec); });
+  return m;
+}
+const CATALOG=knownCatalog();
+
+//==================== RENDER: TABS ====================
+function renderTabs(){
+  const el=document.getElementById("ttabs");
+  el.innerHTML=state.talleres.map(t=>{
+    const s=tallerStats(t);
+    return `<button class="ttab ${t.code===current?'on':''}" data-code="${t.code}">
+      <span class="code">${t.code}</span>
+      <span class="nm">${esc(t.nombre)||'—'}</span>
+      <span class="mini"><i style="width:${s.pct}%"></i></span>
+      <span class="pct">${s.total?s.pct+'% · '+s.total+' eq.':'sin datos'}</span>
+    </button>`;
+  }).join("");
+  el.querySelectorAll(".ttab").forEach(b=>b.onclick=()=>{current=b.dataset.code;renderTabs();renderPanel();});
+}
+
+//==================== RENDER: PANEL ====================
+function renderPanel(){
+  const t=tallerByCode(current), s=tallerStats(t);
+  const panel=document.getElementById("panel");
+  let rows;
+  if(!t.items.length){
+    rows=`<div class="empty"><h3>Taller sin equipos asignados</h3>
+      <p>Agrega los equipos del estándar para este taller, o muévelos desde otra sala.</p></div>`;
+  }else{
+    rows=`<div class="scroll"><table><thead><tr>
+        <th>Equipo</th><th class="num">Estándar</th><th class="act">Actual</th>
+        <th>Estado</th><th style="text-align:right">Acciones</th>
+      </tr></thead><tbody>${t.items.map(it=>rowHTML(it)).join("")}</tbody></table></div>`;
+  }
+  const moveOpts=state.talleres.filter(x=>x.code!==current)
+    .map(x=>`<option value="${x.code}">${x.code}</option>`).join("");
+
+  panel.innerHTML=`
+    <div class="thead">
+      <div class="tt">
+        <span class="tcode">TALLER ${t.code}</span>
+        <input class="nm-in" id="nmIn" value="${esc(t.nombre)}" placeholder="Nombre del taller…">
+      </div>
+      <div class="kpis">
+        <div class="kpi ok"><b>${s.cumple}</b><span>Cumple</span></div>
+        <div class="kpi bad"><b>${s.conGap}</b><span>Con brecha</span></div>
+        <div class="kpi none"><b>${s.pend}</b><span>Por revisar</span></div>
+        <div class="kpi"><b class="mono" style="color:var(--bad)">${s.gap}</b><span>Unid. faltantes</span></div>
+      </div>
+    </div>
+    <div class="meter"><i style="width:${s.pct}%;background:${s.pct>=85?'var(--ok)':s.pct>=50?'var(--warn)':'var(--bad)'}"></i></div>
+    <div class="meterlbl">${s.evaluados} de ${s.total} equipos revisados · ${s.pct}% de cumplimiento sobre lo revisado</div>
+
+    <div class="tablewrap">
+      ${rows}
+      <div class="tfoot">
+        <button class="addbtn" id="addToggle">+ Agregar equipo</button>
+        <div class="addform" id="addForm">
+          <input class="f-eq" id="aEq" list="catList" placeholder="Equipo (escribe o elige)">
+          <textarea class="f-spec" id="aSpec" placeholder="Especificación técnica (opcional)"></textarea>
+          <input class="f-std mono" id="aStd" type="number" min="1" value="1" placeholder="Cant.">
+          <button class="btn" id="aSave">Agregar</button>
+          <button class="btn ghost" id="aCancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <datalist id="catList">${[...CATALOG.keys()].map(k=>`<option value="${esc(k)}">`).join("")}</datalist>
+  `;
+
+  // nombre editable
+  const nm=document.getElementById("nmIn");
+  nm.oninput=()=>{t.nombre=nm.value;save();renderTabs();};
+
+  // actual inputs
+  panel.querySelectorAll(".actin").forEach(inp=>{
+    inp.oninput=()=>{
+      const it=t.items.find(x=>x.id===inp.dataset.id);
+      it.act = inp.value===""?null:Math.max(0,Math.floor(Number(inp.value)||0));
+      save(); refreshRow(it); refreshHead();
+    };
+  });
+  // estándar inputs
+  panel.querySelectorAll(".stdin").forEach(inp=>{
+    inp.onchange=()=>{
+      const it=t.items.find(x=>x.id===inp.dataset.id);
+      it.std=Math.max(0,Math.floor(Number(inp.value)||0)); inp.value=it.std;
+      save(); refreshRow(it); refreshHead();
+    };
+  });
+  // spec toggles
+  panel.querySelectorAll(".spectoggle").forEach(b=>{
+    b.onclick=()=>{const sp=b.nextElementSibling;sp.classList.toggle("show");
+      b.textContent=sp.classList.contains("show")?"Ocultar especificación":"Ver especificación";};
+  });
+  // delete
+  panel.querySelectorAll(".del").forEach(b=>{
+    b.onclick=()=>{ t.items=t.items.filter(x=>x.id!==b.dataset.id); save(); renderPanel(); renderTabs(); };
+  });
+  // move
+  panel.querySelectorAll(".movesel").forEach(sel=>{
+    sel.onchange=()=>{
+      const it=t.items.find(x=>x.id===sel.dataset.id);
+      const dest=tallerByCode(sel.value);
+      t.items=t.items.filter(x=>x.id!==it.id); dest.items.push(it);
+      save(); renderPanel(); renderTabs(); toast(`Movido a ${dest.code}`);
+    };
+  });
+  // add form
+  const af=document.getElementById("addForm"), tg=document.getElementById("addToggle");
+  tg.onclick=()=>{af.classList.add("show");tg.style.display="none";document.getElementById("aEq").focus();};
+  document.getElementById("aCancel").onclick=()=>{af.classList.remove("show");tg.style.display="";};
+  document.getElementById("aEq").oninput=function(){
+    if(CATALOG.has(this.value)){const sp=document.getElementById("aSpec");if(!sp.value)sp.value=CATALOG.get(this.value);}
+  };
+  document.getElementById("aSave").onclick=()=>{
+    const eq=document.getElementById("aEq").value.trim();
+    if(!eq){toast("Escribe el nombre del equipo");return;}
+    const spec=document.getElementById("aSpec").value.trim();
+    const std=Math.max(1,Math.floor(Number(document.getElementById("aStd").value)||1));
+    t.items.push({id:nid(),eq,spec,std,act:null});
+    save(); renderPanel(); renderTabs(); toast("Equipo agregado");
+  };
+
+  function moveSelector(id){
+    return `<select class="movesel" data-id="${id}" title="Mover a otro taller">
+      <option value="">Mover…</option>${moveOpts}</select>`;
+  }
+  // attach move opts already inlined via rowHTML; nothing else
+}
+
+function rowHTML(it){
+  const st=statusOf(it);
+  const moveOpts=state.talleres.filter(x=>x.code!==current)
+    .map(x=>`<option value="${x.code}">${x.code}</option>`).join("");
+  return `<tr data-row="${it.id}">
+    <td>
+      <div class="eq">${esc(it.eq)}</div>
+      ${it.spec?`<button class="spectoggle">Ver especificación</button><div class="spec">${esc(it.spec)}</div>`:""}
+    </td>
+    <td class="num"><input class="actin stdin" data-id="${it.id}" type="number" min="0" value="${it.std}" style="border-style:solid;color:var(--muted)"></td>
+    <td class="act"><input class="actin ${it.act===null?'empty':''}" data-id="${it.id}" type="number" min="0" placeholder="—" value="${it.act===null?'':it.act}"></td>
+    <td><span class="badge ${st.cls}" data-badge="${it.id}">${st.label}</span></td>
+    <td>
+      <div class="rowact">
+        <select class="movesel" data-id="${it.id}" title="Mover a otro taller"><option value="">Mover…</option>${moveOpts}</select>
+        <button class="iconbtn del" data-id="${it.id}" title="Eliminar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+        </button>
+      </div>
+    </td>
+  </tr>`;
+}
+function refreshRow(it){
+  const st=statusOf(it);
+  const b=document.querySelector(`[data-badge="${it.id}"]`);
+  if(b){b.className="badge "+st.cls;b.textContent=st.label;}
+  const inp=document.querySelector(`.act .actin[data-id="${it.id}"]`);
+  if(inp){inp.classList.toggle("empty",it.act===null);}
+}
+function refreshHead(){
+  const t=tallerByCode(current),s=tallerStats(t);
+  const k=document.querySelectorAll(".kpi b");
+  if(k.length>=4){k[0].textContent=s.cumple;k[1].textContent=s.conGap;k[2].textContent=s.pend;k[3].textContent=s.gap;}
+  const mi=document.querySelector(".meter i");
+  if(mi){mi.style.width=s.pct+"%";mi.style.background=s.pct>=85?'var(--ok)':s.pct>=50?'var(--warn)':'var(--bad)';}
+  const ml=document.querySelector(".meterlbl");
+  if(ml)ml.textContent=`${s.evaluados} de ${s.total} equipos revisados · ${s.pct}% de cumplimiento sobre lo revisado`;
+  renderTabs(); refreshGlobal();
+}
+function refreshGlobal(){
+  const g=globalStats();
+  document.getElementById("gPct").textContent=g.pct+"%";
+  document.getElementById("gFalt").textContent=g.gap;
+}
+
+//==================== RENDER: PLAN ====================
+function renderPlan(){
+  const v=document.getElementById("planView");
+  const groups=state.talleres.map(t=>{
+    const items=t.items.map(it=>({it,st:statusOf(it)})).filter(o=>o.st.gap>0);
+    const pend=t.items.filter(it=>statusOf(it).key==="none").length;
+    return {t,items,pend};
+  });
+  const totalGap=groups.reduce((a,g)=>a+g.items.reduce((x,o)=>x+o.st.gap,0),0);
+  const totalLineas=groups.reduce((a,g)=>a+g.items.length,0);
+  const totalPend=groups.reduce((a,g)=>a+g.pend,0);
+
+  let body;
+  if(totalLineas===0){
+    body=`<div class="planok">No hay brechas registradas. Todos los equipos revisados cumplen el estándar.
+      ${totalPend?`<div class="pendwarn">Quedan ${totalPend} equipos por revisar.</div>`:""}</div>`;
+  }else{
+    body=groups.filter(g=>g.items.length).map(g=>{
+      const sub=g.items.reduce((x,o)=>x+o.st.gap,0);
+      return `<div class="plangrp">
+        <h3><span class="tag">${g.t.code}</span> ${esc(g.t.nombre)}
+          <small>· ${g.items.length} equipos · faltan ${sub} unidades${g.pend?` · ${g.pend} por revisar`:""}</small></h3>
+        <div class="plantable"><div class="scroll"><table>
+          <thead><tr><th>Equipo</th><th class="num">Estándar</th><th class="num">Actual</th><th class="num">Faltan</th></tr></thead>
+          <tbody>${g.items.map(o=>`<tr>
+            <td><div class="eq">${esc(o.it.eq)}</div>${o.it.spec?`<div class="spec show" style="margin-top:4px">${esc(o.it.spec)}</div>`:""}</td>
+            <td class="num mono std">${o.it.std}</td>
+            <td class="num mono">${o.it.act}</td>
+            <td class="num pq">${o.st.gap}</td></tr>`).join("")}</tbody>
+        </table></div></div>
+      </div>`;
+    }).join("");
+  }
+
+  v.innerHTML=`
+    <div class="planhead">
+      <h2>Plan de inversión · brechas</h2>
+      <div class="kpis">
+        <div class="kpi bad"><b class="mono">${totalGap}</b><span>Unid. faltantes</span></div>
+        <div class="kpi"><b class="mono">${totalLineas}</b><span>Equipos con brecha</span></div>
+        <div class="kpi none"><b>${totalPend}</b><span>Por revisar</span></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="copyPlan">Copiar listado</button>
+        <button class="btn" id="printPlan">Imprimir / PDF</button>
+      </div>
+    </div>
+    ${body}`;
+
+  document.getElementById("printPlan").onclick=()=>window.print();
+  document.getElementById("copyPlan").onclick=()=>copyPlan(groups);
+}
+function copyPlan(groups){
+  let txt=`PLAN DE INVERSIÓN — BRECHAS DE EQUIPAMIENTO\n`;
+  if(state.sede)txt+=`Sede: ${state.sede}\n`;
+  txt+=`\n`;
+  let any=false;
+  groups.filter(g=>g.items.length).forEach(g=>{
+    any=true;
+    txt+=`TALLER ${g.t.code} — ${g.t.nombre}\n`;
+    g.items.forEach(o=>{txt+=`  • ${o.it.eq}: faltan ${o.st.gap} (estándar ${o.it.std}, actual ${o.it.act})\n`;});
+    txt+=`\n`;
+  });
+  if(!any)txt+="Sin brechas registradas.\n";
+  navigator.clipboard.writeText(txt).then(()=>toast("Listado copiado al portapapeles"))
+    .catch(()=>toast("No se pudo copiar"));
+}
+
+//==================== REPORT ====================
+function reportData(){
+  const fecha=new Date().toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"});
+  const g=globalStats();
+  let totalEq=0,totalCumple=0,totalGap=0,totalPend=0,totalConGap=0;
+  const talleres=state.talleres.map(t=>{
+    const s=tallerStats(t);
+    totalEq+=s.total;totalCumple+=s.cumple;totalGap+=s.gap;totalPend+=s.pend;totalConGap+=s.conGap;
+    const gaps=t.items.map(it=>({it,st:statusOf(it)})).filter(o=>o.st.gap>0);
+    return {t,s,gaps};
+  });
+  return {fecha,sede:state.sede||"—",gPct:g.pct,totalEq,totalCumple,totalGap,totalPend,totalConGap,talleres};
+}
+function reportBody(d){
+  const resumenRows=d.talleres.map(o=>`<tr>
+      <td class="c"><b>${o.t.code}</b></td><td>${esc(o.t.nombre)||"—"}</td>
+      <td class="n">${o.s.total}</td><td class="n ok">${o.s.cumple}</td>
+      <td class="n bad">${o.s.conGap}</td><td class="n">${o.s.pend}</td>
+      <td class="n bad"><b>${o.s.gap}</b></td>
+      <td class="n">${o.s.total?o.s.pct+"%":"—"}</td></tr>`).join("");
+
+  const detalle=d.talleres.filter(o=>o.gaps.length).map(o=>`
+      <h3>Taller ${o.t.code} · ${esc(o.t.nombre)} <small>— faltan ${o.gaps.reduce((a,x)=>a+x.st.gap,0)} unidades</small></h3>
+      <table class="det"><thead><tr><th>Equipo</th><th class="n">Estándar</th><th class="n">Actual</th><th class="n">Faltan</th></tr></thead>
+      <tbody>${o.gaps.map(x=>`<tr><td>${esc(x.it.eq)}</td><td class="n">${x.it.std}</td><td class="n">${x.it.act}</td><td class="n bad"><b>${x.st.gap}</b></td></tr>`).join("")}</tbody></table>`).join("");
+
+  return `
+    <div class="rhead">
+      <div>
+        <div class="reye">Estándar de sede · Gastronomía</div>
+        <h1>Reporte de cumplimiento de equipamiento</h1>
+      </div>
+      <div class="rmeta"><div><span>Sede</span><b>${esc(d.sede)}</b></div><div><span>Fecha</span><b>${d.fecha}</b></div></div>
+    </div>
+
+    <div class="rkpis">
+      <div class="rk"><b>${d.gPct}%</b><span>Cumplimiento global</span></div>
+      <div class="rk"><b>${d.totalEq}</b><span>Equipos del estándar</span></div>
+      <div class="rk ok"><b>${d.totalCumple}</b><span>Cumplen</span></div>
+      <div class="rk bad"><b>${d.totalConGap}</b><span>Con brecha</span></div>
+      <div class="rk bad"><b>${d.totalGap}</b><span>Unidades faltantes</span></div>
+      <div class="rk"><b>${d.totalPend}</b><span>Por revisar</span></div>
+    </div>
+
+    <h2>Resumen por taller</h2>
+    <table class="resumen"><thead><tr>
+      <th class="c">Taller</th><th>Nombre</th><th class="n">Equipos</th><th class="n">Cumple</th>
+      <th class="n">Brecha</th><th class="n">Por rev.</th><th class="n">Faltan</th><th class="n">% cumpl.</th>
+    </tr></thead><tbody>${resumenRows}</tbody></table>
+
+    <h2>Detalle de brechas (para inversión)</h2>
+    ${detalle || `<p class="okmsg">No hay brechas registradas en los equipos revisados.</p>`}
+    ${d.totalPend?`<p class="foot">Nota: ${d.totalPend} equipos aún no han sido revisados; sus cantidades actuales no están registradas.</p>`:""}
+    <p class="foot">Asignación de talleres provisional, generada a partir del estándar de sede.</p>`;
+}
+const REPORT_CSS=`
+  *{box-sizing:border-box} body{font-family:"Inter",-apple-system,system-ui,sans-serif;color:#1A1D1A;
+    background:#fff;margin:0;padding:38px;line-height:1.5;font-size:13px}
+  h1{font-size:24px;margin:2px 0 0;letter-spacing:-.01em} h2{font-size:16px;margin:30px 0 10px;
+    padding-bottom:6px;border-bottom:2px solid #115E59}
+  h3{font-size:14px;margin:18px 0 7px} h3 small{font-weight:400;color:#6E7268}
+  .reye{font:600 11px/1 sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#115E59}
+  .rhead{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;
+    border-bottom:1px solid #E4E2DB;padding-bottom:18px}
+  .rmeta{display:flex;gap:26px;text-align:right} .rmeta span{display:block;font-size:10px;
+    text-transform:uppercase;letter-spacing:.06em;color:#6E7268} .rmeta b{font-size:14px}
+  .rkpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:22px 0}
+  .rk{border:1px solid #E4E2DB;border-radius:10px;padding:11px 13px}
+  .rk b{display:block;font-size:21px;letter-spacing:-.02em} .rk span{font-size:10px;color:#6E7268;
+    text-transform:uppercase;letter-spacing:.04em} .rk.ok b{color:#15803D} .rk.bad b{color:#B91C1C}
+  table{width:100%;border-collapse:collapse;font-size:12.5px} th{text-align:left;font-size:10px;
+    text-transform:uppercase;letter-spacing:.05em;color:#6E7268;padding:8px 9px;border-bottom:1px solid #D2CFC6}
+  td{padding:8px 9px;border-bottom:1px solid #EFEEEB} th.n,td.n{text-align:center} th.c,td.c{text-align:center}
+  td.ok{color:#15803D} td.bad{color:#B91C1C} .resumen tbody tr:last-child td{border-bottom:1px solid #D2CFC6}
+  .det{margin-bottom:6px} .okmsg{background:#E6F2EA;color:#15803D;border-radius:8px;padding:14px;font-weight:600}
+  .foot{font-size:11px;color:#6E7268;margin-top:14px}
+  @media (max-width:620px){.rkpis{grid-template-columns:repeat(3,1fr)}}
+  @media print{body{padding:0}}
+`;
+function renderReport(){
+  const d=reportData();
+  document.getElementById("reportView").innerHTML=`
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn" id="dlReport">Descargar reporte (HTML)</button>
+      <button class="btn" id="printReport">Imprimir / Guardar PDF</button>
+    </div>
+    <div class="reportdoc" style="background:var(--surface);border:1px solid var(--line);border-radius:14px;
+      padding:30px;box-shadow:var(--shadow)">
+      <style>${REPORT_CSS}</style>
+      ${reportBody(d)}
+    </div>`;
+  document.getElementById("printReport").onclick=()=>window.print();
+  document.getElementById("dlReport").onclick=()=>downloadReport(d);
+}
+function downloadReport(d){
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reporte de cumplimiento — ${esc(d.sede)} — ${d.fecha}</title>
+<style>${REPORT_CSS}</style></head><body>${reportBody(d)}</body></html>`;
+  const blob=new Blob([html],{type:"text/html"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  const stamp=new Date().toISOString().slice(0,10);
+  a.href=url; a.download=`reporte-talleres-${stamp}.html`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast("Reporte descargado");
+}
+
+//==================== VIEW SWITCH ====================
+function setView(v){
+  view=v;
+  document.querySelectorAll(".vtab").forEach(b=>b.classList.toggle("on",b.dataset.view===v));
+  document.getElementById("tallerView").style.display=v==="talleres"?"":"none";
+  document.getElementById("planView").style.display=v==="plan"?"":"none";
+  document.getElementById("reportView").style.display=v==="reporte"?"":"none";
+  if(v==="plan")renderPlan();
+  if(v==="reporte")renderReport();
+}
+
+//==================== TOAST ====================
+let toastT=null;
+function toast(msg){
+  const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("show"),2200);
+}
+
+//==================== INIT ====================
+async function init(){
+  const loaded=await load();
+  state = loaded || buildDefault();
+  // re-secuenciar ids para evitar choques
+  state.talleres.forEach(t=>t.items.forEach(it=>{if(!it.id)it.id=nid();}));
+
+  document.getElementById("sedeIn").value=state.sede||"";
+  document.getElementById("sedeIn").oninput=function(){state.sede=this.value;save();};
+
+  if(state.noteHidden) document.getElementById("note").style.display="none";
+  document.getElementById("noteX").onclick=()=>{
+    document.getElementById("note").style.display="none";state.noteHidden=true;save();};
+
+  document.getElementById("vTalleres").onclick=()=>setView("talleres");
+  document.getElementById("vPlan").onclick=()=>setView("plan");
+  document.getElementById("vReporte").onclick=()=>setView("reporte");
+
+  document.getElementById("resetBtn").onclick=async()=>{
+    if(!confirm("¿Reiniciar todo? Se borrarán las cantidades actuales y los cambios al estándar, volviendo a la asignación provisional inicial."))return;
+    state=buildDefault();
+    await storageSet(JSON.stringify(state));
+    document.getElementById("sedeIn").value="";
+    document.getElementById("note").style.display="";
+    current="500A";setView("talleres");renderTabs();renderPanel();refreshGlobal();toast("Restablecido");
+  };
+
+  renderTabs();renderPanel();refreshGlobal();setView("talleres");
+}
+init();
+</script>
+</body>
+</html>
