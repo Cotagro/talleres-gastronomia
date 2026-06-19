@@ -53,6 +53,11 @@
   .btn:hover{border-color:var(--ink)}
   .btn.ghost{background:transparent}
   .btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+  .syncchip{font:600 11px/1 "Space Grotesk",sans-serif;letter-spacing:.04em;
+    border:1px solid var(--line-strong);border-radius:999px;padding:6px 11px;
+    color:var(--muted);white-space:nowrap}
+  .syncchip.on{color:var(--ok);border-color:#BFE0CB;background:var(--ok-soft)}
+  .syncchip.warn{color:var(--warn);border-color:#E9D5B4;background:var(--warn-soft)}
 
   /* ---- view switch ---- */
   .views{max-width:1180px;margin:0 auto;padding:0 22px;display:flex;gap:6px;
@@ -210,6 +215,8 @@
     <div class="global">
       <div class="gstat"><b class="mono" id="gPct">—</b><span>Cumplimiento</span></div>
       <div class="gstat"><b class="mono" id="gFalt" style="color:var(--bad)">—</b><span>Unid. faltantes</span></div>
+      <span class="syncchip" id="syncChip" title="Dónde se guardan los datos">Local</span>
+      <button class="btn ghost" id="reloadBtn" title="Traer los últimos datos de la nube" style="display:none">Sincronizar</button>
       <button class="btn ghost danger" id="resetBtn">Reiniciar</button>
     </div>
   </div>
@@ -239,6 +246,20 @@
 <div class="toast" id="toast"></div>
 
 <script>
+//==================== CONFIGURACIÓN DE FIREBASE ====================
+// Pega aquí el objeto "firebaseConfig" que te da la consola de Firebase.
+// Mientras esté vacío, la app guarda en el navegador (modo local).
+const FIREBASE_CONFIG = {
+  // apiKey: "…",
+  // authDomain: "tu-proyecto.firebaseapp.com",
+  // projectId: "tu-proyecto",
+  // storageBucket: "tu-proyecto.appspot.com",
+  // messagingSenderId: "…",
+  // appId: "…"
+};
+const FIRE_COLLECTION = "talleres";  // colección en Firestore
+const FIRE_DOC = "estado";           // documento único con todos los datos
+
 //==================== SEED DATA (estándar provisional por función) ====================
 // std = cantidad del estándar | act = cantidad actual (null = sin registrar)
 const TALLER_DEFS = [
@@ -401,19 +422,43 @@ function buildDefault(){
   };
 }
 
-//==================== PERSISTENCE ====================
-// Funciona en 3 entornos: almacenamiento de artefacto (window.storage),
-// navegador normal / GitHub Pages (localStorage), o solo memoria.
+//==================== PERSISTENCE (Firebase / navegador / memoria) ====================
+let fb={ready:false,fns:null,docRef:null};
+const CLIENT_ID=Math.random().toString(36).slice(2,9);
+let lastWritten=null, pendingRemote=null;
+
+async function initFirebase(){
+  if(!FIREBASE_CONFIG || !FIREBASE_CONFIG.projectId) return false;
+  try{
+    const appMod=await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js");
+    const fsMod =await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js");
+    const app=appMod.initializeApp(FIREBASE_CONFIG);
+    const db=fsMod.getFirestore(app);
+    fb.fns=fsMod; fb.docRef=fsMod.doc(db,FIRE_COLLECTION,FIRE_DOC); fb.ready=true;
+    storageMode="firebase";
+    return true;
+  }catch(e){ console.error("Firebase no se pudo iniciar:",e); return false; }
+}
+
 async function storageGet(){
+  if(fb.ready){
+    try{ const snap=await fb.fns.getDoc(fb.docRef); return snap.exists()?(snap.data().json||null):null; }
+    catch(e){ console.error("Lectura Firebase falló:",e); return null; }
+  }
   if(typeof window.storage!=="undefined" && window.storage){
     storageMode="cloud";
-    try{ const r=await window.storage.get(STORE_KEY,false); return r&&r.value?r.value:null; }
-    catch(e){ return null; }
+    try{ const r=await window.storage.get(STORE_KEY,false); return r&&r.value?r.value:null; }catch(e){ return null; }
   }
   try{ const v=localStorage.getItem(STORE_KEY); storageMode="local"; return v; }catch(e){}
   storageMode="memory"; return null;
 }
 async function storageSet(val){
+  if(fb.ready){
+    lastWritten=val;
+    try{ await fb.fns.setDoc(fb.docRef,{json:val,updatedAt:Date.now(),by:CLIENT_ID}); }
+    catch(e){ console.error("Guardado Firebase falló:",e); setSyncStatus("Error al guardar"); }
+    return;
+  }
   if(typeof window.storage!=="undefined" && window.storage){
     try{ await window.storage.set(STORE_KEY,val,false); return; }catch(e){}
   }
@@ -421,13 +466,50 @@ async function storageSet(val){
 }
 let saveTimer=null;
 function save(){
+  setSyncStatus("Guardando…");
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{ storageSet(JSON.stringify(state)); },300);
+  saveTimer=setTimeout(async()=>{ await storageSet(JSON.stringify(state)); setSyncStatus("Guardado"); },400);
 }
 async function load(){
   const raw=await storageGet();
   if(raw){ try{ return JSON.parse(raw); }catch(e){} }
   return null;
+}
+
+// ----- sincronización en vivo (solo Firebase) -----
+function listenFirebase(){
+  if(!fb.ready) return;
+  fb.fns.onSnapshot(fb.docRef,snap=>{
+    if(snap.metadata.hasPendingWrites) return;   // ignora el eco de nuestra propia escritura
+    if(!snap.exists()) return;
+    const json=snap.data().json;
+    if(!json || json===lastWritten) return;
+    applyRemote(json);
+  },err=>console.error("onSnapshot:",err));
+}
+function inputFocused(){
+  const a=document.activeElement;
+  return !!(a && (a.classList.contains("actin")||a.classList.contains("nm-in")||a.classList.contains("sede-in")||(a.closest&&a.closest(".addform"))));
+}
+function applyRemote(json){
+  if(inputFocused()){ pendingRemote=json; setSyncStatus("Cambios nuevos"); return; }
+  doApplyRemote(json);
+}
+function doApplyRemote(json){
+  let s; try{ s=JSON.parse(json); }catch(e){ return; }
+  state=s; pendingRemote=null;
+  state.talleres.forEach(t=>t.items.forEach(it=>{if(!it.id)it.id=nid();}));
+  const sin=document.getElementById("sedeIn"); if(sin)sin.value=state.sede||"";
+  renderTabs();
+  if(view==="talleres")renderPanel(); else if(view==="plan")renderPlan(); else if(view==="reporte")renderReport();
+  refreshGlobal(); setSyncStatus("Sincronizado");
+}
+function setSyncStatus(txt){
+  const c=document.getElementById("syncChip"); if(!c)return;
+  const map={firebase:"Nube",cloud:"Nube",local:"Local",memory:"Solo memoria"};
+  const base= fb.ready?"Nube":(map[storageMode]||"Local");
+  c.textContent = txt? base+" · "+txt : base;
+  c.className="syncchip "+(fb.ready?"on":"")+(txt==="Cambios nuevos"||txt==="Error al guardar"?" warn":"");
 }
 
 //==================== HELPERS ====================
@@ -833,10 +915,13 @@ function toast(msg){
 
 //==================== INIT ====================
 async function init(){
+  await initFirebase();
   const loaded=await load();
   state = loaded || buildDefault();
   // re-secuenciar ids para evitar choques
   state.talleres.forEach(t=>t.items.forEach(it=>{if(!it.id)it.id=nid();}));
+  // si la nube está vacía en el primer uso, sembrar el estándar inicial
+  if(!loaded && fb.ready){ await storageSet(JSON.stringify(state)); }
 
   document.getElementById("sedeIn").value=state.sede||"";
   document.getElementById("sedeIn").oninput=function(){state.sede=this.value;save();};
@@ -849,6 +934,12 @@ async function init(){
   document.getElementById("vPlan").onclick=()=>setView("plan");
   document.getElementById("vReporte").onclick=()=>setView("reporte");
 
+  document.getElementById("reloadBtn").onclick=async()=>{
+    if(pendingRemote){ doApplyRemote(pendingRemote); }
+    else { const raw=await storageGet(); if(raw)doApplyRemote(raw); }
+    toast("Datos actualizados");
+  };
+
   document.getElementById("resetBtn").onclick=async()=>{
     if(!confirm("¿Reiniciar todo? Se borrarán las cantidades actuales y los cambios al estándar, volviendo a la asignación provisional inicial."))return;
     state=buildDefault();
@@ -858,7 +949,14 @@ async function init(){
     current="500A";setView("talleres");renderTabs();renderPanel();refreshGlobal();toast("Restablecido");
   };
 
+  // al terminar de editar un campo, aplica cambios remotos que quedaron en espera
+  document.addEventListener("focusout",()=>setTimeout(()=>{
+    if(pendingRemote && !inputFocused()) doApplyRemote(pendingRemote);
+  },200));
+
   renderTabs();renderPanel();refreshGlobal();setView("talleres");
+  setSyncStatus("");
+  if(fb.ready){ document.getElementById("reloadBtn").style.display=""; listenFirebase(); }
 }
 init();
 </script>
