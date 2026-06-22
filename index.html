@@ -603,7 +603,8 @@ function renderPanel(){
         <div class="addform" id="addForm">
           <input class="f-eq" id="aEq" list="catList" placeholder="Equipo (escribe o elige)">
           <textarea class="f-spec" id="aSpec" placeholder="Especificación técnica (opcional)"></textarea>
-          <input class="f-std mono" id="aStd" type="number" min="1" value="1" placeholder="Cant.">
+          <input class="f-std mono" id="aStd" type="number" min="0" value="1" placeholder="Estándar" title="Cuánto debe haber">
+          <input class="f-std mono" id="aAct" type="number" min="0" placeholder="Actual" title="Cuánto hay (opcional)">
           <button class="btn" id="aSave">Agregar</button>
           <button class="btn ghost" id="aCancel">Cancelar</button>
         </div>
@@ -616,8 +617,8 @@ function renderPanel(){
   const nm=document.getElementById("nmIn");
   nm.oninput=()=>{t.nombre=nm.value;save();renderTabs();};
 
-  // actual inputs
-  panel.querySelectorAll(".actin").forEach(inp=>{
+  // actual inputs (solo los de la columna "Actual")
+  panel.querySelectorAll(".act .actin").forEach(inp=>{
     inp.oninput=()=>{
       const it=t.items.find(x=>x.id===inp.dataset.id);
       it.act = inp.value===""?null:Math.max(0,Math.floor(Number(inp.value)||0));
@@ -662,15 +663,11 @@ function renderPanel(){
     if(!eq){toast("Escribe el nombre del equipo");return;}
     const spec=document.getElementById("aSpec").value.trim();
     const std=Math.max(1,Math.floor(Number(document.getElementById("aStd").value)||1));
-    t.items.push({id:nid(),eq,spec,std,act:null});
+    const actRaw=document.getElementById("aAct").value;
+    const act = actRaw==="" ? null : Math.max(0,Math.floor(Number(actRaw)||0));
+    t.items.push({id:nid(),eq,spec,std,act});
     save(); renderPanel(); renderTabs(); toast("Equipo agregado");
   };
-
-  function moveSelector(id){
-    return `<select class="movesel" data-id="${id}" title="Mover a otro taller">
-      <option value="">Mover…</option>${moveOpts}</select>`;
-  }
-  // attach move opts already inlined via rowHTML; nothing else
 }
 
 function rowHTML(it){
