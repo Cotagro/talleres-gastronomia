@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   :root{
     --bg:#F7F6F3; --surface:#FFFFFF; --ink:#1A1D1A; --muted:#6E7268;
@@ -20,181 +21,143 @@
   }
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
-  body{
-    margin:0;background:var(--bg);color:var(--ink);
-    font-family:"Inter",system-ui,sans-serif;font-size:14px;line-height:1.5;
-    -webkit-font-smoothing:antialiased;
-  }
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
   h1,h2,h3{font-family:"Space Grotesk",sans-serif;margin:0;letter-spacing:-.01em}
   .mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums}
   button{font-family:inherit;cursor:pointer}
   input,select,textarea{font-family:inherit}
 
-  /* ---- top bar ---- */
-  header{
-    position:sticky;top:0;z-index:30;background:rgba(247,246,243,.88);
-    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
-  }
-  .bar{max-width:1180px;margin:0 auto;padding:16px 22px;display:flex;
-    align-items:center;gap:18px;flex-wrap:wrap}
+  /* top bar */
+  header{position:sticky;top:0;z-index:30;background:rgba(247,246,243,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .bar{max-width:1180px;margin:0 auto;padding:16px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
   .brand{display:flex;flex-direction:column;gap:2px;margin-right:auto}
-  .eyebrow{font:600 11px/1 "Space Grotesk",sans-serif;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--accent)}
+  .eyebrow{font:600 11px/1 "Space Grotesk",sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
   .brand h1{font-size:21px;font-weight:600}
-  .sede-in{border:none;background:transparent;font:inherit;color:var(--muted);
-    font-size:12px;padding:1px 0;width:min(260px,60vw)}
+  .sede-in{border:none;background:transparent;font:inherit;color:var(--muted);font-size:12px;padding:1px 0;width:min(260px,60vw)}
   .sede-in:focus{outline:none;color:var(--ink)}
   .global{display:flex;align-items:center;gap:14px}
   .gstat{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
   .gstat b{font:600 19px/1 "Space Grotesk";}
   .gstat span{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-  .btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);
-    border-radius:9px;padding:8px 13px;font-weight:600;font-size:12.5px;transition:.12s}
+  .btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:9px;padding:8px 13px;font-weight:600;font-size:12.5px;transition:.12s}
   .btn:hover{border-color:var(--ink)}
   .btn.ghost{background:transparent}
   .btn.danger:hover{border-color:var(--bad);color:var(--bad)}
-  .syncchip{font:600 11px/1 "Space Grotesk",sans-serif;letter-spacing:.04em;
-    border:1px solid var(--line-strong);border-radius:999px;padding:6px 11px;
-    color:var(--muted);white-space:nowrap}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.primary:hover{opacity:.88}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .syncchip{font:600 11px/1 "Space Grotesk",sans-serif;letter-spacing:.04em;border:1px solid var(--line-strong);border-radius:999px;padding:6px 11px;color:var(--muted);white-space:nowrap}
   .syncchip.on{color:var(--ok);border-color:#BFE0CB;background:var(--ok-soft)}
   .syncchip.warn{color:var(--warn);border-color:#E9D5B4;background:var(--warn-soft)}
 
-  /* ---- view switch ---- */
-  .views{max-width:1180px;margin:0 auto;padding:0 22px;display:flex;gap:6px;
-    border-bottom:1px solid var(--line)}
-  .vtab{border:none;background:transparent;padding:13px 4px;margin-right:18px;
-    color:var(--muted);font-weight:600;font-size:13.5px;border-bottom:2px solid transparent;
-    margin-bottom:-1px}
+  /* view switch */
+  .views{max-width:1180px;margin:0 auto;padding:0 22px;display:flex;gap:6px;border-bottom:1px solid var(--line)}
+  .vtab{border:none;background:transparent;padding:13px 4px;margin-right:18px;color:var(--muted);font-weight:600;font-size:13.5px;border-bottom:2px solid transparent;margin-bottom:-1px}
   .vtab.on{color:var(--ink);border-bottom-color:var(--accent)}
 
   main{max-width:1180px;margin:0 auto;padding:22px}
 
-  /* ---- provisional banner ---- */
-  .note{display:flex;gap:12px;align-items:flex-start;background:var(--warn-soft);
-    border:1px solid #E9D5B4;border-radius:12px;padding:13px 15px;margin-bottom:20px;
-    font-size:13px;color:#6b4413}
+  /* banner */
+  .note{display:flex;gap:12px;align-items:flex-start;background:var(--warn-soft);border:1px solid #E9D5B4;border-radius:12px;padding:13px 15px;margin-bottom:20px;font-size:13px;color:#6b4413}
   .note b{color:#5a3a10}
-  .note .x{margin-left:auto;border:none;background:transparent;color:#9c7a3f;
-    font-size:17px;line-height:1;padding:0 2px}
+  .note .x{margin-left:auto;border:none;background:transparent;color:#9c7a3f;font-size:17px;line-height:1;padding:0 2px}
   .note svg{flex:0 0 18px;margin-top:1px}
 
-  /* ---- taller tabs ---- */
-  .ttabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;
-    scrollbar-width:thin}
-  .ttab{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);
-    border-radius:11px;padding:10px 14px;text-align:left;min-width:118px;transition:.12s}
+  /* taller tabs */
+  .ttabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;scrollbar-width:thin}
+  .ttab{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:10px 14px;text-align:left;min-width:118px;transition:.12s}
   .ttab:hover{border-color:var(--line-strong)}
   .ttab.on{border-color:var(--ink);box-shadow:var(--shadow)}
   .ttab .code{font:700 15px/1 "Space Grotesk";display:block}
-  .ttab .nm{font-size:11px;color:var(--muted);display:block;margin:3px 0 7px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+  .ttab .nm{font-size:11px;color:var(--muted);display:block;margin:3px 0 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
   .ttab .mini{height:4px;border-radius:3px;background:var(--none-soft);overflow:hidden}
   .ttab .mini i{display:block;height:100%;background:var(--ok)}
   .ttab .pct{font:600 10.5px/1 "JetBrains Mono";color:var(--muted);margin-top:5px;display:block}
 
-  /* ---- taller panel ---- */
+  /* taller panel */
   .thead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
   .thead .tt{display:flex;flex-direction:column;gap:3px;margin-right:auto}
   .thead .tt .tcode{font:700 13px/1 "Space Grotesk";color:var(--accent);letter-spacing:.04em}
-  .nm-in{border:none;background:transparent;font:600 24px/1.1 "Space Grotesk";color:var(--ink);
-    padding:2px 0;width:min(420px,80vw);border-bottom:1px dashed transparent}
+  .nm-in{border:none;background:transparent;font:600 24px/1.1 "Space Grotesk";color:var(--ink);padding:2px 0;width:min(420px,80vw);border-bottom:1px dashed transparent}
   .nm-in:hover{border-bottom-color:var(--line-strong)}
   .nm-in:focus{outline:none;border-bottom-color:var(--accent)}
-
   .kpis{display:flex;gap:10px;flex-wrap:wrap}
-  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:11px;
-    padding:9px 14px;min-width:92px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 14px;min-width:92px}
   .kpi b{font:600 20px/1 "Space Grotesk";display:block}
   .kpi span{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
   .kpi.ok b{color:var(--ok)} .kpi.bad b{color:var(--bad)} .kpi.none b{color:var(--none)}
-
   .meter{height:8px;border-radius:5px;background:var(--none-soft);overflow:hidden;margin:16px 0 6px}
   .meter i{display:block;height:100%;background:var(--ok);transition:width .35s}
   .meterlbl{font-size:11.5px;color:var(--muted);margin-bottom:18px}
 
-  /* ---- table ---- */
-  .tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;
-    overflow:hidden;box-shadow:var(--shadow)}
+  /* table */
+  .tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
   .scroll{overflow-x:auto}
   table{width:100%;border-collapse:collapse;min-width:720px}
-  thead th{font:600 10.5px/1 "Space Grotesk";letter-spacing:.08em;text-transform:uppercase;
-    color:var(--muted);text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);
-    background:#FBFAF7;position:sticky;top:0}
+  thead th{font:600 10.5px/1 "Space Grotesk";letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);background:#FBFAF7;position:sticky;top:0}
   th.num,td.num{text-align:center;width:74px}
   th.act,td.act{width:96px}
   td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
   tbody tr:last-child td{border-bottom:none}
   tbody tr:hover{background:#FCFBF8}
   .eq{font-weight:600;font-size:13.5px}
-  .spectoggle{border:none;background:transparent;color:var(--accent);font-size:11.5px;
-    font-weight:600;padding:3px 0;margin-top:2px}
-  .spec{font-size:12px;color:var(--muted);margin-top:6px;max-width:540px;display:none;
-    white-space:pre-wrap}
+  .spectoggle{border:none;background:transparent;color:var(--accent);font-size:11.5px;font-weight:600;padding:3px 0;margin-top:2px}
+  .spec{font-size:12px;color:var(--muted);margin-top:6px;max-width:540px;display:none;white-space:pre-wrap}
   .spec.show{display:block}
-  td.num .mono{font-size:14px}
-  .std{color:var(--muted)}
-  .actin{width:62px;text-align:center;border:1px solid var(--line-strong);border-radius:8px;
-    padding:6px 4px;font:600 14px "JetBrains Mono";color:var(--ink);background:var(--surface)}
+  .actin{width:62px;text-align:center;border:1px solid var(--line-strong);border-radius:8px;padding:6px 4px;font:600 14px "JetBrains Mono";color:var(--ink);background:var(--surface)}
   .actin:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   .actin.empty{border-style:dashed;color:var(--none)}
-
-  .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;
-    padding:4px 10px;font:600 11.5px/1 "Inter";white-space:nowrap}
+  .badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font:600 11.5px/1 "Inter";white-space:nowrap}
   .badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
   .b-ok{background:var(--ok-soft);color:var(--ok)}
   .b-warn{background:var(--warn-soft);color:var(--warn)}
   .b-bad{background:var(--bad-soft);color:var(--bad)}
   .b-none{background:var(--none-soft);color:#5f6368}
   .b-exc{background:var(--accent-soft);color:var(--accent-ink)}
-
   .rowact{display:flex;gap:4px;justify-content:flex-end}
-  .iconbtn{border:1px solid transparent;background:transparent;color:var(--muted);
-    border-radius:7px;padding:5px;line-height:0}
+  .iconbtn{border:1px solid transparent;background:transparent;color:var(--muted);border-radius:7px;padding:5px;line-height:0}
   .iconbtn:hover{background:var(--bg);color:var(--ink)}
   .iconbtn.del:hover{color:var(--bad)}
-  .movesel{border:1px solid var(--line);border-radius:7px;font-size:11px;padding:4px 6px;
-    color:var(--muted);background:var(--surface)}
-
-  .tfoot{padding:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#FBFAF7;
-    border-top:1px solid var(--line)}
-  .addbtn{border:1px dashed var(--line-strong);background:transparent;border-radius:9px;
-    padding:8px 13px;font-weight:600;font-size:12.5px;color:var(--accent)}
+  .movesel{border:1px solid var(--line);border-radius:7px;font-size:11px;padding:4px 6px;color:var(--muted);background:var(--surface)}
+  .tfoot{padding:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#FBFAF7;border-top:1px solid var(--line)}
+  .addbtn{border:1px dashed var(--line-strong);background:transparent;border-radius:9px;padding:8px 13px;font-weight:600;font-size:12.5px;color:var(--accent)}
   .addbtn:hover{border-color:var(--accent);background:var(--accent-soft)}
-
-  /* add form */
   .addform{display:none;gap:9px;flex-wrap:wrap;align-items:flex-start;width:100%}
   .addform.show{display:flex}
-  .addform input,.addform textarea{border:1px solid var(--line-strong);border-radius:9px;
-    padding:8px 10px;font-size:13px}
+  .addform input,.addform textarea{border:1px solid var(--line-strong);border-radius:9px;padding:8px 10px;font-size:13px}
   .addform .f-eq{flex:1 1 200px}
   .addform .f-spec{flex:2 1 280px;resize:vertical;min-height:38px;font-size:12px}
   .addform .f-std{width:78px;text-align:center;font-family:"JetBrains Mono"}
-
   .empty{padding:48px 22px;text-align:center;color:var(--muted)}
   .empty h3{font-size:16px;color:var(--ink);margin-bottom:6px}
 
-  /* ---- investment plan ---- */
+  /* plan */
   .planhead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
   .planhead h2{font-size:24px;margin-right:auto}
   .plangrp{margin-bottom:22px}
   .plangrp h3{font-size:15px;display:flex;align-items:center;gap:10px;margin-bottom:9px}
-  .plangrp h3 .tag{font:700 11px/1 "Space Grotesk";color:var(--accent);
-    background:var(--accent-soft);border-radius:6px;padding:4px 7px}
+  .plangrp h3 .tag{font:700 11px/1 "Space Grotesk";color:var(--accent);background:var(--accent-soft);border-radius:6px;padding:4px 7px}
   .plangrp h3 small{font-weight:500;color:var(--muted);font-family:"Inter"}
   .plantable{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
   .plantable table{min-width:560px}
   .pq{font:700 14px "JetBrains Mono";color:var(--bad)}
-  .planok{background:var(--ok-soft);border:1px solid #BFE0CB;border-radius:12px;
-    padding:22px;text-align:center;color:var(--ok);font-weight:600}
+  .planok{background:var(--ok-soft);border:1px solid #BFE0CB;border-radius:12px;padding:22px;text-align:center;color:var(--ok);font-weight:600}
   .pendwarn{font-size:12px;color:var(--warn);margin-top:5px}
 
-  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
-    background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;
-    font-weight:500;opacity:0;transition:.25s;z-index:60;pointer-events:none}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:.25s;z-index:60;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+  /* PDF modal */
+  #pdfOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center}
+  #pdfOverlay.show{display:flex}
+  #pdfBox{background:#fff;border-radius:16px;padding:28px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  #pdfBox h3{font-size:17px;margin-bottom:6px}
+  #pdfBox p{font-size:13px;color:var(--muted);margin-bottom:20px}
+  #pdfBox .pbtns{display:flex;flex-direction:column;gap:9px}
+  #pdfProgress{font-size:12px;color:var(--muted);margin-top:12px;min-height:18px}
+
   @media print{
-    header,.views,.ttabs,.note,.tfoot,.rowact,.btn{display:none!important}
+    header,.views,.ttabs,.note,.tfoot,.rowact,.btn,#pdfOverlay{display:none!important}
     body{background:#fff}
     .plantable,.tablewrap{box-shadow:none}
   }
@@ -215,8 +178,8 @@
     <div class="global">
       <div class="gstat"><b class="mono" id="gPct">—</b><span>Cumplimiento</span></div>
       <div class="gstat"><b class="mono" id="gFalt" style="color:var(--bad)">—</b><span>Unid. faltantes</span></div>
-      <span class="syncchip" id="syncChip" title="Dónde se guardan los datos">Local</span>
-      <button class="btn ghost" id="reloadBtn" title="Traer los últimos datos de la nube" style="display:none">Sincronizar</button>
+      <span class="syncchip" id="syncChip">Local</span>
+      <button class="btn ghost" id="reloadBtn" style="display:none">Sincronizar</button>
       <button class="btn ghost danger" id="resetBtn">Reiniciar</button>
     </div>
   </div>
@@ -231,24 +194,35 @@
   <div class="note" id="note">
     <svg viewBox="0 0 24 24" fill="none" stroke="#b07a2a" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z"/></svg>
     <div><b>Asignación de talleres provisional.</b> La lista original no traía la columna de taller, así que los equipos se agruparon por función. Verifica cada sala y mueve, edita o elimina lo que no corresponda. El <b>503</b> está vacío a la espera de tus datos. Todo lo que ingreses se guarda automáticamente.</div>
-    <button class="x" id="noteX" title="Ocultar">×</button>
+    <button class="x" id="noteX">×</button>
   </div>
-
   <div id="tallerView">
     <div class="ttabs" id="ttabs"></div>
     <div id="panel"></div>
   </div>
-
   <div id="planView" style="display:none"></div>
   <div id="reportView" style="display:none"></div>
 </main>
 
+<!-- Modal exportar PDF -->
+<div id="pdfOverlay">
+  <div id="pdfBox">
+    <h3>Exportar reporte</h3>
+    <p>Elige el formato de descarga.</p>
+    <div class="pbtns">
+      <button class="btn primary" id="pdfDirect">⬇ Descargar PDF</button>
+      <button class="btn" id="pdfPrint">🖨 Imprimir / Guardar PDF</button>
+      <button class="btn ghost" id="pdfHtml">Guardar HTML</button>
+      <button class="btn ghost" id="pdfClose" style="margin-top:4px;color:var(--muted)">Cancelar</button>
+    </div>
+    <div id="pdfProgress"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-//==================== CONFIGURACIÓN DE FIREBASE ====================
-// Pega aquí el objeto que te da la consola de Firebase (entre las llaves).
-// Mientras esté vacío, la app guarda en el navegador (modo local).
+//==================== FIREBASE CONFIG ====================
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBQB6LAjY4LCBDLVSb57EoDd3kSFVE2c-Y",
   authDomain: "talleres-gastronomia.firebaseapp.com",
@@ -257,19 +231,18 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "651315000261",
   appId: "1:651315000261:web:a829375bdd8c73d4fc51ac"
 };
-const FIRE_COLLECTION = "talleres";  // colección en Firestore
-const FIRE_DOC = "estado";           // documento único con todos los datos
+const FIRE_COLLECTION="talleres", FIRE_DOC="estado";
 
-//==================== SEED DATA (estándar provisional por función) ====================
-// std = cantidad del estándar | act = cantidad actual (null = sin registrar)
-const TALLER_DEFS = [
-  {code:"500A", nombre:"Cocina Caliente"},
-  {code:"500B", nombre:"Cocina de Producción / Autoservicio"},
-  {code:"501",  nombre:"Comedor Didáctico"},
-  {code:"502",  nombre:"Cocina Fría / Sala de Frío"},
-  {code:"503",  nombre:"Por definir"},
-  {code:"504",  nombre:"Pastelería"},
-  {code:"505",  nombre:"Panadería"},
+//==================== SEED ====================
+const TALLER_DEFS=[
+  {code:"500A",nombre:"Cocina Caliente"},
+  {code:"500B",nombre:"Cocina de Producción / Autoservicio"},
+  {code:"501", nombre:"Comedor Didáctico"},
+  {code:"502", nombre:"Cocina Fría / Sala de Frío"},
+  {code:"503", nombre:"Por definir"},
+  {code:"504", nombre:"Pastelería"},
+  {code:"505", nombre:"Panadería"},
+  {code:"BOD", nombre:"Bodega"},
 ];
 
 const ABL="Maxi 25, kit de instalación y sal. Unidad ablandadora de agua, volumétrica estadística doble alternado, con válvula de 1 1/2\" electrónica de control. Microprocesador y contador emisor de impulsos. Regulador de dureza residual incorporado. Resina catiónica calidad alimentaria. Caudal desde 6 m³/hr, conexión 220 volt.";
@@ -294,34 +267,18 @@ const LAV2="Acero inoxidable, respaldo 10 cm en una pieza. Taza estampada 50×40
 const LAV3="Acero inoxidable, respaldo 10 cm en una pieza. Taza estampada 50×40×25 cm y llave combinada agua fría/caliente. 2 tazas y 1 secador (ss), 1 llave con pre-wash.";
 const LAV4="Acero inoxidable AISI 304L. Respaldo 10 cm en una sola pieza con la cubierta. Taza estampada 50×40×30 cm y llave tipo cisne. Desagüe inox. Patas en perfil tubular redondo Ø41 mm.";
 const LAV5="Acero inoxidable AISI 304L. Respaldo 10 cm en una sola pieza con la cubierta. Taza estampada 50×40×30 cm y llave PRE-WASH. 2 tazas y 2 secadores (ss). Desagüe inox.";
-
-function lavSet(){return [
-  ["Lavadero",LAV1,1],["Lavadero",LAV2,1],["Lavadero",LAV3,1],["Lavadero",LAV4,1],["Lavadero",LAV5,1]
-];}
-
-// Núcleo de cocina caliente compartido por 500A y 500B
-function hotCore(){return [
-  ["Abatidor de frío",ABAT,1],
-  ["Campana cocina (central)",CAMP_C,1],
-  ["Campana hornos (mural)",CAMP_M,1],
-  ["Carro especiero",ESPECIERO,1],
-  ["Congelador visicooler / talleres",CONG,2],
-  ["Estante para útiles de aseo",ESTANTE,1],
-  ...lavSet(),
-  ["Lavamanos mural",LAVAM,2],
-  ["Máquina fabricadora de hielo",HIELO,1],
-  ["Mesón de apoyo",M_APOYO,1],
-  ["Mesón de desconche",M_DESC,2],
-  ["Mesón de trabajo",M_TRAB,2],
-  ["Mesón de trabajo central",M_CENT,10],
-  ["Microondas profesional",MICRO,1],
-  ["Pañol móvil",PANOL,1],
+function lavSet(){return[["Lavadero",LAV1,1],["Lavadero",LAV2,1],["Lavadero",LAV3,1],["Lavadero",LAV4,1],["Lavadero",LAV5,1]];}
+function hotCore(){return[
+  ["Abatidor de frío",ABAT,1],["Campana cocina (central)",CAMP_C,1],["Campana hornos (mural)",CAMP_M,1],
+  ["Carro especiero",ESPECIERO,1],["Congelador visicooler / talleres",CONG,2],["Estante para útiles de aseo",ESTANTE,1],
+  ...lavSet(),["Lavamanos mural",LAVAM,2],["Máquina fabricadora de hielo",HIELO,1],
+  ["Mesón de apoyo",M_APOYO,1],["Mesón de desconche",M_DESC,2],["Mesón de trabajo",M_TRAB,2],
+  ["Mesón de trabajo central",M_CENT,10],["Microondas profesional",MICRO,1],["Pañol móvil",PANOL,1],
   ["Refrigerador visicooler / talleres",REFRI,2],
 ];}
 
-const SEED = {
-  "500A":[
-    ...hotCore(),
+const SEED={
+  "500A":[...hotCore(),
     ["Aire acondicionado","Según dimensiones del espacio físico, 36000 BTU.",1],
     ["Cocina industrial a gas",COC_GAS,1],
     ["Batidora profesional","Tipo KitchenAid, bowl acero inoxidable. 220 V, estructura fundición. 5 velocidades, incluye paleta, globo y gancho. Cabezal elevable y bowl extraíble. 250 W, 4.5 lts.",4],
@@ -338,8 +295,7 @@ const SEED = {
     ["Armario térmico","Para despacho, acero inoxidable. Con ruedas, repisa doble con infrarrojo simple / calentador de platos.",1],
     ["Balanza de piso","De piso, digital, capacidad máxima ~150 kg.",1],
   ],
-  "500B":[
-    ...hotCore(),
+  "500B":[...hotCore(),
     ["Cocina industrial a gas",COC_GAS,2],
     ["Accesorio plancha","Plancha churrasquera acanalada (para marcar), acero laminado 12 mm, borde perimetral y canaleta recolectora de jugos con despiche. 82×66×12.5 cm.",1],
     ["Anafe plancha parrilla","Anafe base a gas. Frente, costados, posterior, bastidores y patas nivelables en acero inox. Quemadores tubulares (QTI) con venturi y perforaciones tipo celosía.",1],
@@ -368,8 +324,7 @@ const SEED = {
     ["Visicooler / Refrigeración bajo barra","Acero inox. Mesón refrigerado de dos puertas (ref. TRUE) adecuado al diseño de la barra.",1],
   ],
   "502":[
-    ["Ablandador de agua",ABL,1],
-    ["Ablandador de agua",ABL,2],
+    ["Ablandador de agua",ABL,1],["Ablandador de agua",ABL,2],
     ["Máquina lavavajilla","Apertura frontal, para cestas 500×500, 220 volt, desde 40 rack/hr. Admite bandejas GN 1/1. Dosificador de detergente y abrillantador, pantalla de temperaturas. Incluye 1 rack de platos, 1 rack plano y 1 caja de cubiertos.",1],
     ["Atril abatidor","Mueble de acero inoxidable (soporte para abatidor de temperatura, según dimensiones).",1],
     ["Atril Horno combinado","Soporte horno combinado Rational.",1],
@@ -380,8 +335,7 @@ const SEED = {
   ],
   "503":[],
   "504":[
-    ["Ablandador de agua",ABL,3],
-    ["Ablandador de agua",ABL,4],
+    ["Ablandador de agua",ABL,3],["Ablandador de agua",ABL,4],
     ["Máquina cafetera","Cafetera semiautomática de 2 grupos de erogación. Grifo de agua caliente, válvula vaporizadora con electrobomba, control electrónico de temperatura en caldera y de nivel de agua.",1],
     ["Máquina lavavajilla bajo mesón","Acero inox AISI 304. Brazos de lavado/enjuague rotatorios en polímero reforzado. Filtro bomba en polipropileno y fibra de vidrio, puerta doble, manilla encajada ergonómica, brazos intercambiables. Microswitch de seguridad de puerta, consumo 2,8 lts/ciclo, termostop de enjuague 81–83 °C.",1],
     ["Atril abatidor","Mueble de acero inoxidable (soporte para abatidor de temperatura, según dimensiones).",1],
@@ -403,157 +357,128 @@ const SEED = {
     ["Sobadora","Acero inoxidable o esmaltado, capacidad mínima 5 kg, rodillo en acero pulido, deslizadores inox, monofásico o trifásico. Sobremesón.",1],
     ["Lámpara infrarroja","Para trabajo de azúcar. Lámpara con distintas potencias que mantiene el caramelo blando; la mesa también da calor. Mínimo 500 W.",1],
   ],
+  "BOD":[
+    ["Estantería metálica pesada","Estante industrial tipo rack, 5 niveles, capacidad mínima 300 kg por nivel. Estructura de acero pintado o galvanizado. Medidas aproximadas 200×90×40 cm.",6],
+    ["Paleta / palet de madera","Palet de madera estándar 120×80 cm, tratado NIMF-15. Para almacenamiento de materiales en el piso.",10],
+    ["Carro plataforma manual","Carro plataforma de acero con ruedas de nylon, capacidad 300 kg. Con manilla ergonómica y plataforma 60×90 cm.",2],
+    ["Carro hidráulico (palletjack)","Transpaleta manual, capacidad 2.500 kg, horquillas 1150×160×60 mm. Acero, pintura epóxica.",1],
+    ["Contenedor hermético apilable","Contenedor de polipropileno alimentario con tapa hermética, capacidad 20–60 lts. Apilable, con ruedas.",10],
+    ["Termómetro digital infrarrojo","Termómetro de infrarrojos para control de temperatura en recepción de mercadería. Rango -50 a +380 °C.",2],
+    ["Balanza de piso digital","Balanza de piso digital, capacidad 300 kg, plataforma 40×50 cm. Visualizador LCD, acero inoxidable.",1],
+    ["Estante mural para utensilios","Repisa mural de acero inoxidable AISI 304, 30 cm de fondo, largo según muro. Con soportes regulables.",3],
+  ],
 };
 
 //==================== STATE ====================
 const STORE_KEY="estandar_talleres_v1";
-let state=null, current="500A", view="talleres", noteHidden=false;
+let state=null, current="500A", view="talleres";
 let _id=0; const nid=()=>"i"+(++_id);
 let storageMode="memory";
 
 function buildDefault(){
-  return {
-    sede:"",
-    noteHidden:false,
-    talleres: TALLER_DEFS.map(d=>({
-      code:d.code, nombre:d.nombre,
+  return{
+    sede:"",noteHidden:false,
+    talleres:TALLER_DEFS.map(d=>({
+      code:d.code,nombre:d.nombre,
       items:(SEED[d.code]||[]).map(([eq,spec,std])=>({id:nid(),eq,spec,std,act:null}))
     }))
   };
 }
 
-//==================== PERSISTENCE (Firebase / navegador / memoria) ====================
+//==================== PERSISTENCE ====================
 let fb={ready:false,fns:null,docRef:null};
 const CLIENT_ID=Math.random().toString(36).slice(2,9);
-let lastWritten=null, pendingRemote=null;
+let lastWritten=null,pendingRemote=null;
 
 async function initFirebase(){
   try{
-    if(typeof FIREBASE_CONFIG==="undefined" || !FIREBASE_CONFIG || !FIREBASE_CONFIG.projectId) return false;
+    if(!FIREBASE_CONFIG||!FIREBASE_CONFIG.projectId)return false;
     const appMod=await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js");
-    const fsMod =await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js");
+    const fsMod=await import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js");
     const app=appMod.initializeApp(FIREBASE_CONFIG);
     const db=fsMod.getFirestore(app);
-    fb.fns=fsMod; fb.docRef=fsMod.doc(db,FIRE_COLLECTION,FIRE_DOC); fb.ready=true;
-    storageMode="firebase";
-    return true;
-  }catch(e){ console.error("Firebase no se pudo iniciar:",e); fb.ready=false; return false; }
+    fb.fns=fsMod;fb.docRef=fsMod.doc(db,FIRE_COLLECTION,FIRE_DOC);fb.ready=true;
+    storageMode="firebase";return true;
+  }catch(e){console.error("Firebase no se pudo iniciar:",e);fb.ready=false;return false;}
 }
-
 async function storageGet(){
-  if(fb.ready){
-    try{ const snap=await fb.fns.getDoc(fb.docRef); return snap.exists()?(snap.data().json||null):null; }
-    catch(e){ console.error("Lectura Firebase falló:",e); return null; }
-  }
-  if(typeof window.storage!=="undefined" && window.storage){
-    storageMode="cloud";
-    try{ const r=await window.storage.get(STORE_KEY,false); return r&&r.value?r.value:null; }catch(e){ return null; }
-  }
-  try{ const v=localStorage.getItem(STORE_KEY); storageMode="local"; return v; }catch(e){}
-  storageMode="memory"; return null;
+  if(fb.ready){try{const s=await fb.fns.getDoc(fb.docRef);return s.exists()?(s.data().json||null):null;}catch(e){return null;}}
+  if(typeof window.storage!=="undefined"&&window.storage){storageMode="cloud";try{const r=await window.storage.get(STORE_KEY,false);return r&&r.value?r.value:null;}catch(e){return null;}}
+  try{const v=localStorage.getItem(STORE_KEY);storageMode="local";return v;}catch(e){}
+  storageMode="memory";return null;
 }
 async function storageSet(val){
-  if(fb.ready){
-    lastWritten=val;
-    try{ await fb.fns.setDoc(fb.docRef,{json:val,updatedAt:Date.now(),by:CLIENT_ID}); }
-    catch(e){ console.error("Guardado Firebase falló:",e); setSyncStatus("Error al guardar"); }
-    return;
-  }
-  if(typeof window.storage!=="undefined" && window.storage){
-    try{ await window.storage.set(STORE_KEY,val,false); return; }catch(e){}
-  }
-  try{ localStorage.setItem(STORE_KEY,val); }catch(e){}
+  if(fb.ready){lastWritten=val;try{await fb.fns.setDoc(fb.docRef,{json:val,updatedAt:Date.now(),by:CLIENT_ID});}catch(e){console.error("Guardado Firebase falló:",e);setSyncStatus("Error al guardar");}return;}
+  if(typeof window.storage!=="undefined"&&window.storage){try{await window.storage.set(STORE_KEY,val,false);return;}catch(e){}}
+  try{localStorage.setItem(STORE_KEY,val);}catch(e){}
 }
 let saveTimer=null;
 function save(){
   setSyncStatus("Guardando…");
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(async()=>{ await storageSet(JSON.stringify(state)); setSyncStatus("Guardado"); },400);
+  saveTimer=setTimeout(async()=>{await storageSet(JSON.stringify(state));setSyncStatus("Guardado");},400);
 }
-async function load(){
-  const raw=await storageGet();
-  if(raw){ try{ return JSON.parse(raw); }catch(e){} }
-  return null;
-}
+async function load(){const raw=await storageGet();if(raw){try{return JSON.parse(raw);}catch(e){}}return null;}
 
-// ----- sincronización en vivo (solo Firebase) -----
 function listenFirebase(){
-  if(!fb.ready) return;
+  if(!fb.ready)return;
   fb.fns.onSnapshot(fb.docRef,snap=>{
-    if(snap.metadata.hasPendingWrites) return;   // ignora el eco de nuestra propia escritura
-    if(!snap.exists()) return;
+    if(snap.metadata.hasPendingWrites)return;
+    if(!snap.exists())return;
     const json=snap.data().json;
-    if(!json || json===lastWritten) return;
+    if(!json||json===lastWritten)return;
     applyRemote(json);
   },err=>console.error("onSnapshot:",err));
 }
-function inputFocused(){
-  const a=document.activeElement;
-  return !!(a && (a.classList.contains("actin")||a.classList.contains("nm-in")||a.classList.contains("sede-in")||(a.closest&&a.closest(".addform"))));
-}
-function applyRemote(json){
-  if(inputFocused()){ pendingRemote=json; setSyncStatus("Cambios nuevos"); return; }
-  doApplyRemote(json);
-}
+function inputFocused(){const a=document.activeElement;return !!(a&&(a.classList.contains("actin")||a.classList.contains("nm-in")||a.classList.contains("sede-in")||(a.closest&&a.closest(".addform"))));}
+function applyRemote(json){if(inputFocused()){pendingRemote=json;setSyncStatus("Cambios nuevos");return;}doApplyRemote(json);}
 function doApplyRemote(json){
-  let s; try{ s=JSON.parse(json); }catch(e){ return; }
-  state=s; pendingRemote=null;
+  let s;try{s=JSON.parse(json);}catch(e){return;}
+  state=s;pendingRemote=null;
   state.talleres.forEach(t=>t.items.forEach(it=>{if(!it.id)it.id=nid();}));
-  const sin=document.getElementById("sedeIn"); if(sin)sin.value=state.sede||"";
+  const sin=document.getElementById("sedeIn");if(sin)sin.value=state.sede||"";
   renderTabs();
-  if(view==="talleres")renderPanel(); else if(view==="plan")renderPlan(); else if(view==="reporte")renderReport();
-  refreshGlobal(); setSyncStatus("Sincronizado");
+  if(view==="talleres")renderPanel();else if(view==="plan")renderPlan();else if(view==="reporte")renderReport();
+  refreshGlobal();setSyncStatus("Sincronizado");
 }
 function setSyncStatus(txt){
-  const c=document.getElementById("syncChip"); if(!c)return;
-  const map={firebase:"Nube",cloud:"Nube",local:"Local",memory:"Solo memoria"};
-  const base= fb.ready?"Nube":(map[storageMode]||"Local");
-  c.textContent = txt? base+" · "+txt : base;
+  const c=document.getElementById("syncChip");if(!c)return;
+  const base=fb.ready?"Nube":(storageMode==="local"?"Local":"Solo memoria");
+  c.textContent=txt?base+" · "+txt:base;
   c.className="syncchip "+(fb.ready?"on":"")+(txt==="Cambios nuevos"||txt==="Error al guardar"?" warn":"");
 }
 
 //==================== HELPERS ====================
 function tallerByCode(c){return state.talleres.find(t=>t.code===c);}
 function statusOf(it){
-  if(it.act===null||it.act==="") return {key:"none",label:"Sin registrar",cls:"b-none",gap:0};
+  if(it.act===null||it.act==="")return{key:"none",label:"Sin registrar",cls:"b-none",gap:0};
   const a=Number(it.act);
-  if(a>=it.std && a<=it.std) return {key:"ok",label:"Cumple",cls:"b-ok",gap:0};
-  if(a>it.std) return {key:"exc",label:"Excede +"+(a-it.std),cls:"b-exc",gap:0};
-  if(a<=0) return {key:"bad",label:"No hay",cls:"b-bad",gap:it.std};
-  return {key:"warn",label:"Faltan "+(it.std-a),cls:"b-warn",gap:it.std-a};
+  if(a>=it.std)return a>it.std?{key:"exc",label:"Excede +"+(a-it.std),cls:"b-exc",gap:0}:{key:"ok",label:"Cumple",cls:"b-ok",gap:0};
+  if(a<=0)return{key:"bad",label:"No hay",cls:"b-bad",gap:it.std};
+  return{key:"warn",label:"Faltan "+(it.std-a),cls:"b-warn",gap:it.std-a};
 }
 function tallerStats(t){
   let cumple=0,pend=0,gap=0,conGap=0;
-  t.items.forEach(it=>{const s=statusOf(it);
-    if(s.key==="none")pend++; else if(s.gap===0)cumple++;
-    if(s.gap>0){gap+=s.gap;conGap++;}
-  });
-  const total=t.items.length;
-  const evaluados=total-pend;
-  const pct= evaluados? Math.round(cumple/evaluados*100) : (total?0:100);
-  return {total,cumple,pend,gap,conGap,evaluados,pct};
+  t.items.forEach(it=>{const s=statusOf(it);if(s.key==="none")pend++;else if(s.gap===0)cumple++;if(s.gap>0){gap+=s.gap;conGap++;}});
+  const total=t.items.length,evaluados=total-pend;
+  const pct=evaluados?Math.round(cumple/evaluados*100):(total?0:100);
+  return{total,cumple,pend,gap,conGap,evaluados,pct};
 }
 function globalStats(){
-  let gap=0, cumple=0, evaluados=0;
+  let gap=0,cumple=0,evaluados=0;
   state.talleres.forEach(t=>{const s=tallerStats(t);gap+=s.gap;cumple+=s.cumple;evaluados+=s.evaluados;});
-  return {gap, pct: evaluados?Math.round(cumple/evaluados*100):0};
+  return{gap,pct:evaluados?Math.round(cumple/evaluados*100):0};
 }
 const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-// catálogo de equipos conocidos para autocompletar al agregar
-function knownCatalog(){
-  const m=new Map();
-  Object.values(SEED).flat().forEach(([eq,spec])=>{ if(!m.has(eq)) m.set(eq,spec); });
-  return m;
-}
+function knownCatalog(){const m=new Map();Object.values(SEED).flat().forEach(([eq,spec])=>{if(!m.has(eq))m.set(eq,spec);});return m;}
 const CATALOG=knownCatalog();
 
-//==================== RENDER: TABS ====================
+//==================== TABS ====================
 function renderTabs(){
   const el=document.getElementById("ttabs");
   el.innerHTML=state.talleres.map(t=>{
     const s=tallerStats(t);
-    return `<button class="ttab ${t.code===current?'on':''}" data-code="${t.code}">
+    return`<button class="ttab ${t.code===current?'on':''}" data-code="${t.code}">
       <span class="code">${t.code}</span>
       <span class="nm">${esc(t.nombre)||'—'}</span>
       <span class="mini"><i style="width:${s.pct}%"></i></span>
@@ -563,29 +488,18 @@ function renderTabs(){
   el.querySelectorAll(".ttab").forEach(b=>b.onclick=()=>{current=b.dataset.code;renderTabs();renderPanel();});
 }
 
-//==================== RENDER: PANEL ====================
+//==================== PANEL ====================
 function renderPanel(){
-  const t=tallerByCode(current), s=tallerStats(t);
+  const t=tallerByCode(current),s=tallerStats(t);
   const panel=document.getElementById("panel");
-  let rows;
-  if(!t.items.length){
-    rows=`<div class="empty"><h3>Taller sin equipos asignados</h3>
-      <p>Agrega los equipos del estándar para este taller, o muévelos desde otra sala.</p></div>`;
-  }else{
-    rows=`<div class="scroll"><table><thead><tr>
-        <th>Equipo</th><th class="num">Estándar</th><th class="act">Actual</th>
-        <th>Estado</th><th style="text-align:right">Acciones</th>
-      </tr></thead><tbody>${t.items.map(it=>rowHTML(it)).join("")}</tbody></table></div>`;
-  }
-  const moveOpts=state.talleres.filter(x=>x.code!==current)
-    .map(x=>`<option value="${x.code}">${x.code}</option>`).join("");
+  let rows=!t.items.length
+    ?`<div class="empty"><h3>Taller sin equipos asignados</h3><p>Agrega los equipos del estándar para este taller, o muévelos desde otra sala.</p></div>`
+    :`<div class="scroll"><table><thead><tr><th>Equipo</th><th class="num">Estándar</th><th class="act">Actual</th><th>Estado</th><th style="text-align:right">Acciones</th></tr></thead><tbody>${t.items.map(it=>rowHTML(it)).join("")}</tbody></table></div>`;
 
   panel.innerHTML=`
     <div class="thead">
-      <div class="tt">
-        <span class="tcode">TALLER ${t.code}</span>
-        <input class="nm-in" id="nmIn" value="${esc(t.nombre)}" placeholder="Nombre del taller…">
-      </div>
+      <div class="tt"><span class="tcode">TALLER ${t.code}</span>
+        <input class="nm-in" id="nmIn" value="${esc(t.nombre)}" placeholder="Nombre del taller…"></div>
       <div class="kpis">
         <div class="kpi ok"><b>${s.cumple}</b><span>Cumple</span></div>
         <div class="kpi bad"><b>${s.conGap}</b><span>Con brecha</span></div>
@@ -595,7 +509,6 @@ function renderPanel(){
     </div>
     <div class="meter"><i style="width:${s.pct}%;background:${s.pct>=85?'var(--ok)':s.pct>=50?'var(--warn)':'var(--bad)'}"></i></div>
     <div class="meterlbl">${s.evaluados} de ${s.total} equipos revisados · ${s.pct}% de cumplimiento sobre lo revisado</div>
-
     <div class="tablewrap">
       ${rows}
       <div class="tfoot">
@@ -603,101 +516,77 @@ function renderPanel(){
         <div class="addform" id="addForm">
           <input class="f-eq" id="aEq" list="catList" placeholder="Equipo (escribe o elige)">
           <textarea class="f-spec" id="aSpec" placeholder="Especificación técnica (opcional)"></textarea>
-          <input class="f-std mono" id="aStd" type="number" min="0" value="1" placeholder="Estándar" title="Cuánto debe haber">
-          <input class="f-std mono" id="aAct" type="number" min="0" placeholder="Actual" title="Cuánto hay (opcional)">
+          <input class="f-std mono" id="aStd" type="number" min="0" value="1" placeholder="Estándar">
+          <input class="f-std mono" id="aAct" type="number" min="0" placeholder="Actual">
           <button class="btn" id="aSave">Agregar</button>
           <button class="btn ghost" id="aCancel">Cancelar</button>
         </div>
       </div>
     </div>
-    <datalist id="catList">${[...CATALOG.keys()].map(k=>`<option value="${esc(k)}">`).join("")}</datalist>
-  `;
+    <datalist id="catList">${[...CATALOG.keys()].map(k=>`<option value="${esc(k)}">`).join("")}</datalist>`;
 
-  // nombre editable
-  const nm=document.getElementById("nmIn");
-  nm.oninput=()=>{t.nombre=nm.value;save();renderTabs();};
-
-  // actual inputs (solo los de la columna "Actual")
+  document.getElementById("nmIn").oninput=function(){t.nombre=this.value;save();renderTabs();};
   panel.querySelectorAll(".act .actin").forEach(inp=>{
     inp.oninput=()=>{
       const it=t.items.find(x=>x.id===inp.dataset.id);
-      it.act = inp.value===""?null:Math.max(0,Math.floor(Number(inp.value)||0));
-      save(); refreshRow(it); refreshHead();
+      it.act=inp.value===""?null:Math.max(0,Math.floor(Number(inp.value)||0));
+      save();refreshRow(it);refreshHead();
     };
   });
-  // estándar inputs
   panel.querySelectorAll(".stdin").forEach(inp=>{
     inp.onchange=()=>{
       const it=t.items.find(x=>x.id===inp.dataset.id);
-      it.std=Math.max(0,Math.floor(Number(inp.value)||0)); inp.value=it.std;
-      save(); refreshRow(it); refreshHead();
+      it.std=Math.max(0,Math.floor(Number(inp.value)||0));inp.value=it.std;
+      save();refreshRow(it);refreshHead();
     };
   });
-  // spec toggles
   panel.querySelectorAll(".spectoggle").forEach(b=>{
-    b.onclick=()=>{const sp=b.nextElementSibling;sp.classList.toggle("show");
-      b.textContent=sp.classList.contains("show")?"Ocultar especificación":"Ver especificación";};
+    b.onclick=()=>{const sp=b.nextElementSibling;sp.classList.toggle("show");b.textContent=sp.classList.contains("show")?"Ocultar especificación":"Ver especificación";};
   });
-  // delete
   panel.querySelectorAll(".del").forEach(b=>{
-    b.onclick=()=>{ t.items=t.items.filter(x=>x.id!==b.dataset.id); save(); renderPanel(); renderTabs(); };
+    b.onclick=()=>{t.items=t.items.filter(x=>x.id!==b.dataset.id);save();renderPanel();renderTabs();};
   });
-  // move
   panel.querySelectorAll(".movesel").forEach(sel=>{
     sel.onchange=()=>{
       const it=t.items.find(x=>x.id===sel.dataset.id);
       const dest=tallerByCode(sel.value);
-      t.items=t.items.filter(x=>x.id!==it.id); dest.items.push(it);
-      save(); renderPanel(); renderTabs(); toast(`Movido a ${dest.code}`);
+      t.items=t.items.filter(x=>x.id!==it.id);dest.items.push(it);
+      save();renderPanel();renderTabs();toast(`Movido a ${dest.code}`);
     };
   });
-  // add form
-  const af=document.getElementById("addForm"), tg=document.getElementById("addToggle");
+  const af=document.getElementById("addForm"),tg=document.getElementById("addToggle");
   tg.onclick=()=>{af.classList.add("show");tg.style.display="none";document.getElementById("aEq").focus();};
   document.getElementById("aCancel").onclick=()=>{af.classList.remove("show");tg.style.display="";};
-  document.getElementById("aEq").oninput=function(){
-    if(CATALOG.has(this.value)){const sp=document.getElementById("aSpec");if(!sp.value)sp.value=CATALOG.get(this.value);}
-  };
+  document.getElementById("aEq").oninput=function(){if(CATALOG.has(this.value)){const sp=document.getElementById("aSpec");if(!sp.value)sp.value=CATALOG.get(this.value);}};
   document.getElementById("aSave").onclick=()=>{
     const eq=document.getElementById("aEq").value.trim();
     if(!eq){toast("Escribe el nombre del equipo");return;}
     const spec=document.getElementById("aSpec").value.trim();
     const std=Math.max(1,Math.floor(Number(document.getElementById("aStd").value)||1));
     const actRaw=document.getElementById("aAct").value;
-    const act = actRaw==="" ? null : Math.max(0,Math.floor(Number(actRaw)||0));
+    const act=actRaw===""?null:Math.max(0,Math.floor(Number(actRaw)||0));
     t.items.push({id:nid(),eq,spec,std,act});
-    save(); renderPanel(); renderTabs(); toast("Equipo agregado");
+    save();renderPanel();renderTabs();toast("Equipo agregado");
   };
 }
-
 function rowHTML(it){
   const st=statusOf(it);
-  const moveOpts=state.talleres.filter(x=>x.code!==current)
-    .map(x=>`<option value="${x.code}">${x.code}</option>`).join("");
-  return `<tr data-row="${it.id}">
-    <td>
-      <div class="eq">${esc(it.eq)}</div>
-      ${it.spec?`<button class="spectoggle">Ver especificación</button><div class="spec">${esc(it.spec)}</div>`:""}
-    </td>
+  const moveOpts=state.talleres.filter(x=>x.code!==current).map(x=>`<option value="${x.code}">${x.code}</option>`).join("");
+  return`<tr data-row="${it.id}">
+    <td><div class="eq">${esc(it.eq)}</div>${it.spec?`<button class="spectoggle">Ver especificación</button><div class="spec">${esc(it.spec)}</div>`:""}</td>
     <td class="num"><input class="actin stdin" data-id="${it.id}" type="number" min="0" value="${it.std}" style="border-style:solid;color:var(--muted)"></td>
     <td class="act"><input class="actin ${it.act===null?'empty':''}" data-id="${it.id}" type="number" min="0" placeholder="—" value="${it.act===null?'':it.act}"></td>
     <td><span class="badge ${st.cls}" data-badge="${it.id}">${st.label}</span></td>
-    <td>
-      <div class="rowact">
-        <select class="movesel" data-id="${it.id}" title="Mover a otro taller"><option value="">Mover…</option>${moveOpts}</select>
-        <button class="iconbtn del" data-id="${it.id}" title="Eliminar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-        </button>
-      </div>
-    </td>
+    <td><div class="rowact">
+      <select class="movesel" data-id="${it.id}" title="Mover a otro taller"><option value="">Mover…</option>${moveOpts}</select>
+      <button class="iconbtn del" data-id="${it.id}" title="Eliminar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
+    </div></td>
   </tr>`;
 }
 function refreshRow(it){
   const st=statusOf(it);
-  const b=document.querySelector(`[data-badge="${it.id}"]`);
-  if(b){b.className="badge "+st.cls;b.textContent=st.label;}
-  const inp=document.querySelector(`.act .actin[data-id="${it.id}"]`);
-  if(inp){inp.classList.toggle("empty",it.act===null);}
+  const b=document.querySelector(`[data-badge="${it.id}"]`);if(b){b.className="badge "+st.cls;b.textContent=st.label;}
+  const inp=document.querySelector(`.act .actin[data-id="${it.id}"]`);if(inp)inp.classList.toggle("empty",it.act===null);
 }
 function refreshHead(){
   const t=tallerByCode(current),s=tallerStats(t);
@@ -707,7 +596,7 @@ function refreshHead(){
   if(mi){mi.style.width=s.pct+"%";mi.style.background=s.pct>=85?'var(--ok)':s.pct>=50?'var(--warn)':'var(--bad)';}
   const ml=document.querySelector(".meterlbl");
   if(ml)ml.textContent=`${s.evaluados} de ${s.total} equipos revisados · ${s.pct}% de cumplimiento sobre lo revisado`;
-  renderTabs(); refreshGlobal();
+  renderTabs();refreshGlobal();
 }
 function refreshGlobal(){
   const g=globalStats();
@@ -715,43 +604,28 @@ function refreshGlobal(){
   document.getElementById("gFalt").textContent=g.gap;
 }
 
-//==================== RENDER: PLAN ====================
+//==================== PLAN ====================
 function renderPlan(){
   const v=document.getElementById("planView");
   const groups=state.talleres.map(t=>{
     const items=t.items.map(it=>({it,st:statusOf(it)})).filter(o=>o.st.gap>0);
     const pend=t.items.filter(it=>statusOf(it).key==="none").length;
-    return {t,items,pend};
+    return{t,items,pend};
   });
   const totalGap=groups.reduce((a,g)=>a+g.items.reduce((x,o)=>x+o.st.gap,0),0);
   const totalLineas=groups.reduce((a,g)=>a+g.items.length,0);
   const totalPend=groups.reduce((a,g)=>a+g.pend,0);
-
-  let body;
-  if(totalLineas===0){
-    body=`<div class="planok">No hay brechas registradas. Todos los equipos revisados cumplen el estándar.
-      ${totalPend?`<div class="pendwarn">Quedan ${totalPend} equipos por revisar.</div>`:""}</div>`;
-  }else{
-    body=groups.filter(g=>g.items.length).map(g=>{
+  let body=totalLineas===0
+    ?`<div class="planok">No hay brechas registradas. Todos los equipos revisados cumplen el estándar.${totalPend?`<div class="pendwarn">Quedan ${totalPend} equipos por revisar.</div>`:""}</div>`
+    :groups.filter(g=>g.items.length).map(g=>{
       const sub=g.items.reduce((x,o)=>x+o.st.gap,0);
-      return `<div class="plangrp">
-        <h3><span class="tag">${g.t.code}</span> ${esc(g.t.nombre)}
-          <small>· ${g.items.length} equipos · faltan ${sub} unidades${g.pend?` · ${g.pend} por revisar`:""}</small></h3>
-        <div class="plantable"><div class="scroll"><table>
-          <thead><tr><th>Equipo</th><th class="num">Estándar</th><th class="num">Actual</th><th class="num">Faltan</th></tr></thead>
-          <tbody>${g.items.map(o=>`<tr>
-            <td><div class="eq">${esc(o.it.eq)}</div>${o.it.spec?`<div class="spec show" style="margin-top:4px">${esc(o.it.spec)}</div>`:""}</td>
-            <td class="num mono std">${o.it.std}</td>
-            <td class="num mono">${o.it.act}</td>
-            <td class="num pq">${o.st.gap}</td></tr>`).join("")}</tbody>
-        </table></div></div>
-      </div>`;
+      return`<div class="plangrp"><h3><span class="tag">${g.t.code}</span> ${esc(g.t.nombre)}<small>· ${g.items.length} equipos · faltan ${sub} unidades${g.pend?` · ${g.pend} por revisar`:""}</small></h3>
+        <div class="plantable"><div class="scroll"><table><thead><tr><th>Equipo</th><th class="num">Estándar</th><th class="num">Actual</th><th class="num">Faltan</th></tr></thead>
+        <tbody>${g.items.map(o=>`<tr><td><div class="eq">${esc(o.it.eq)}</div>${o.it.spec?`<div class="spec show" style="margin-top:4px">${esc(o.it.spec)}</div>`:""}</td><td class="num mono std">${o.it.std}</td><td class="num mono">${o.it.act}</td><td class="num pq">${o.st.gap}</td></tr>`).join("")}</tbody>
+        </table></div></div></div>`;
     }).join("");
-  }
-
   v.innerHTML=`
-    <div class="planhead">
-      <h2>Plan de inversión · brechas</h2>
+    <div class="planhead"><h2>Plan de inversión · brechas</h2>
       <div class="kpis">
         <div class="kpi bad"><b class="mono">${totalGap}</b><span>Unid. faltantes</span></div>
         <div class="kpi"><b class="mono">${totalLineas}</b><span>Equipos con brecha</span></div>
@@ -761,63 +635,62 @@ function renderPlan(){
         <button class="btn" id="copyPlan">Copiar listado</button>
         <button class="btn" id="printPlan">Imprimir / PDF</button>
       </div>
-    </div>
-    ${body}`;
-
+    </div>${body}`;
   document.getElementById("printPlan").onclick=()=>window.print();
   document.getElementById("copyPlan").onclick=()=>copyPlan(groups);
 }
 function copyPlan(groups){
   let txt=`PLAN DE INVERSIÓN — BRECHAS DE EQUIPAMIENTO\n`;
-  if(state.sede)txt+=`Sede: ${state.sede}\n`;
-  txt+=`\n`;
+  if(state.sede)txt+=`Sede: ${state.sede}\n`;txt+=`\n`;
   let any=false;
   groups.filter(g=>g.items.length).forEach(g=>{
-    any=true;
-    txt+=`TALLER ${g.t.code} — ${g.t.nombre}\n`;
-    g.items.forEach(o=>{txt+=`  • ${o.it.eq}: faltan ${o.st.gap} (estándar ${o.it.std}, actual ${o.it.act})\n`;});
-    txt+=`\n`;
+    any=true;txt+=`TALLER ${g.t.code} — ${g.t.nombre}\n`;
+    g.items.forEach(o=>{txt+=`  • ${o.it.eq}: faltan ${o.st.gap} (estándar ${o.it.std}, actual ${o.it.act})\n`;});txt+=`\n`;
   });
   if(!any)txt+="Sin brechas registradas.\n";
-  navigator.clipboard.writeText(txt).then(()=>toast("Listado copiado al portapapeles"))
-    .catch(()=>toast("No se pudo copiar"));
+  navigator.clipboard.writeText(txt).then(()=>toast("Listado copiado al portapapeles")).catch(()=>toast("No se pudo copiar"));
 }
 
-//==================== REPORT ====================
+//==================== REPORTE ====================
+const REPORT_CSS=`
+  *{box-sizing:border-box}body{font-family:"Inter",-apple-system,system-ui,sans-serif;color:#1A1D1A;background:#fff;margin:0;padding:38px;line-height:1.5;font-size:13px}
+  h1{font-size:24px;margin:2px 0 0;letter-spacing:-.01em}h2{font-size:16px;margin:30px 0 10px;padding-bottom:6px;border-bottom:2px solid #115E59}
+  h3{font-size:14px;margin:18px 0 7px}h3 small{font-weight:400;color:#6E7268}
+  .reye{font:600 11px/1 sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#115E59}
+  .rhead{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;border-bottom:1px solid #E4E2DB;padding-bottom:18px}
+  .rmeta{display:flex;gap:26px;text-align:right}.rmeta span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#6E7268}.rmeta b{font-size:14px}
+  .rkpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:22px 0}
+  .rk{border:1px solid #E4E2DB;border-radius:10px;padding:11px 13px}
+  .rk b{display:block;font-size:21px;letter-spacing:-.02em}.rk span{font-size:10px;color:#6E7268;text-transform:uppercase;letter-spacing:.04em}
+  .rk.ok b{color:#15803D}.rk.bad b{color:#B91C1C}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#6E7268;padding:8px 9px;border-bottom:1px solid #D2CFC6}
+  td{padding:8px 9px;border-bottom:1px solid #EFEEEB}th.n,td.n{text-align:center}th.c,td.c{text-align:center}
+  td.ok{color:#15803D}td.bad{color:#B91C1C}.resumen tbody tr:last-child td{border-bottom:1px solid #D2CFC6}
+  .det{margin-bottom:6px}.okmsg{background:#E6F2EA;color:#15803D;border-radius:8px;padding:14px;font-weight:600}
+  .foot{font-size:11px;color:#6E7268;margin-top:14px}
+  @media (max-width:620px){.rkpis{grid-template-columns:repeat(3,1fr)}}
+  @media print{body{padding:0}}
+`;
 function reportData(){
   const fecha=new Date().toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"});
   const g=globalStats();
   let totalEq=0,totalCumple=0,totalGap=0,totalPend=0,totalConGap=0;
   const talleres=state.talleres.map(t=>{
-    const s=tallerStats(t);
-    totalEq+=s.total;totalCumple+=s.cumple;totalGap+=s.gap;totalPend+=s.pend;totalConGap+=s.conGap;
+    const s=tallerStats(t);totalEq+=s.total;totalCumple+=s.cumple;totalGap+=s.gap;totalPend+=s.pend;totalConGap+=s.conGap;
     const gaps=t.items.map(it=>({it,st:statusOf(it)})).filter(o=>o.st.gap>0);
-    return {t,s,gaps};
+    return{t,s,gaps};
   });
-  return {fecha,sede:state.sede||"—",gPct:g.pct,totalEq,totalCumple,totalGap,totalPend,totalConGap,talleres};
+  return{fecha,sede:state.sede||"—",gPct:g.pct,totalEq,totalCumple,totalGap,totalPend,totalConGap,talleres};
 }
 function reportBody(d){
-  const resumenRows=d.talleres.map(o=>`<tr>
-      <td class="c"><b>${o.t.code}</b></td><td>${esc(o.t.nombre)||"—"}</td>
-      <td class="n">${o.s.total}</td><td class="n ok">${o.s.cumple}</td>
-      <td class="n bad">${o.s.conGap}</td><td class="n">${o.s.pend}</td>
-      <td class="n bad"><b>${o.s.gap}</b></td>
-      <td class="n">${o.s.total?o.s.pct+"%":"—"}</td></tr>`).join("");
-
+  const resumenRows=d.talleres.map(o=>`<tr><td class="c"><b>${o.t.code}</b></td><td>${esc(o.t.nombre)||"—"}</td><td class="n">${o.s.total}</td><td class="n ok">${o.s.cumple}</td><td class="n bad">${o.s.conGap}</td><td class="n">${o.s.pend}</td><td class="n bad"><b>${o.s.gap}</b></td><td class="n">${o.s.total?o.s.pct+"%":"—"}</td></tr>`).join("");
   const detalle=d.talleres.filter(o=>o.gaps.length).map(o=>`
-      <h3>Taller ${o.t.code} · ${esc(o.t.nombre)} <small>— faltan ${o.gaps.reduce((a,x)=>a+x.st.gap,0)} unidades</small></h3>
-      <table class="det"><thead><tr><th>Equipo</th><th class="n">Estándar</th><th class="n">Actual</th><th class="n">Faltan</th></tr></thead>
-      <tbody>${o.gaps.map(x=>`<tr><td>${esc(x.it.eq)}</td><td class="n">${x.it.std}</td><td class="n">${x.it.act}</td><td class="n bad"><b>${x.st.gap}</b></td></tr>`).join("")}</tbody></table>`).join("");
-
-  return `
-    <div class="rhead">
-      <div>
-        <div class="reye">Estándar de sede · Gastronomía</div>
-        <h1>Reporte de cumplimiento de equipamiento</h1>
-      </div>
-      <div class="rmeta"><div><span>Sede</span><b>${esc(d.sede)}</b></div><div><span>Fecha</span><b>${d.fecha}</b></div></div>
-    </div>
-
+    <h3>Taller ${o.t.code} · ${esc(o.t.nombre)} <small>— faltan ${o.gaps.reduce((a,x)=>a+x.st.gap,0)} unidades</small></h3>
+    <table class="det"><thead><tr><th>Equipo</th><th class="n">Estándar</th><th class="n">Actual</th><th class="n">Faltan</th></tr></thead>
+    <tbody>${o.gaps.map(x=>`<tr><td>${esc(x.it.eq)}</td><td class="n">${x.it.std}</td><td class="n">${x.it.act}</td><td class="n bad"><b>${x.st.gap}</b></td></tr>`).join("")}</tbody></table>`).join("");
+  return`
+    <div class="rhead"><div><div class="reye">Estándar de sede · Gastronomía</div><h1>Reporte de cumplimiento de equipamiento</h1></div>
+      <div class="rmeta"><div><span>Sede</span><b>${esc(d.sede)}</b></div><div><span>Fecha</span><b>${d.fecha}</b></div></div></div>
     <div class="rkpis">
       <div class="rk"><b>${d.gPct}%</b><span>Cumplimiento global</span></div>
       <div class="rk"><b>${d.totalEq}</b><span>Equipos del estándar</span></div>
@@ -826,70 +699,70 @@ function reportBody(d){
       <div class="rk bad"><b>${d.totalGap}</b><span>Unidades faltantes</span></div>
       <div class="rk"><b>${d.totalPend}</b><span>Por revisar</span></div>
     </div>
-
     <h2>Resumen por taller</h2>
-    <table class="resumen"><thead><tr>
-      <th class="c">Taller</th><th>Nombre</th><th class="n">Equipos</th><th class="n">Cumple</th>
-      <th class="n">Brecha</th><th class="n">Por rev.</th><th class="n">Faltan</th><th class="n">% cumpl.</th>
-    </tr></thead><tbody>${resumenRows}</tbody></table>
-
+    <table class="resumen"><thead><tr><th class="c">Taller</th><th>Nombre</th><th class="n">Equipos</th><th class="n">Cumple</th><th class="n">Brecha</th><th class="n">Por rev.</th><th class="n">Faltan</th><th class="n">% cumpl.</th></tr></thead><tbody>${resumenRows}</tbody></table>
     <h2>Detalle de brechas (para inversión)</h2>
-    ${detalle || `<p class="okmsg">No hay brechas registradas en los equipos revisados.</p>`}
-    ${d.totalPend?`<p class="foot">Nota: ${d.totalPend} equipos aún no han sido revisados; sus cantidades actuales no están registradas.</p>`:""}
+    ${detalle||`<p class="okmsg">No hay brechas registradas en los equipos revisados.</p>`}
+    ${d.totalPend?`<p class="foot">Nota: ${d.totalPend} equipos aún no han sido revisados.</p>`:""}
     <p class="foot">Asignación de talleres provisional, generada a partir del estándar de sede.</p>`;
 }
-const REPORT_CSS=`
-  *{box-sizing:border-box} body{font-family:"Inter",-apple-system,system-ui,sans-serif;color:#1A1D1A;
-    background:#fff;margin:0;padding:38px;line-height:1.5;font-size:13px}
-  h1{font-size:24px;margin:2px 0 0;letter-spacing:-.01em} h2{font-size:16px;margin:30px 0 10px;
-    padding-bottom:6px;border-bottom:2px solid #115E59}
-  h3{font-size:14px;margin:18px 0 7px} h3 small{font-weight:400;color:#6E7268}
-  .reye{font:600 11px/1 sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#115E59}
-  .rhead{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;
-    border-bottom:1px solid #E4E2DB;padding-bottom:18px}
-  .rmeta{display:flex;gap:26px;text-align:right} .rmeta span{display:block;font-size:10px;
-    text-transform:uppercase;letter-spacing:.06em;color:#6E7268} .rmeta b{font-size:14px}
-  .rkpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:22px 0}
-  .rk{border:1px solid #E4E2DB;border-radius:10px;padding:11px 13px}
-  .rk b{display:block;font-size:21px;letter-spacing:-.02em} .rk span{font-size:10px;color:#6E7268;
-    text-transform:uppercase;letter-spacing:.04em} .rk.ok b{color:#15803D} .rk.bad b{color:#B91C1C}
-  table{width:100%;border-collapse:collapse;font-size:12.5px} th{text-align:left;font-size:10px;
-    text-transform:uppercase;letter-spacing:.05em;color:#6E7268;padding:8px 9px;border-bottom:1px solid #D2CFC6}
-  td{padding:8px 9px;border-bottom:1px solid #EFEEEB} th.n,td.n{text-align:center} th.c,td.c{text-align:center}
-  td.ok{color:#15803D} td.bad{color:#B91C1C} .resumen tbody tr:last-child td{border-bottom:1px solid #D2CFC6}
-  .det{margin-bottom:6px} .okmsg{background:#E6F2EA;color:#15803D;border-radius:8px;padding:14px;font-weight:600}
-  .foot{font-size:11px;color:#6E7268;margin-top:14px}
-  @media (max-width:620px){.rkpis{grid-template-columns:repeat(3,1fr)}}
-  @media print{body{padding:0}}
-`;
 function renderReport(){
   const d=reportData();
   document.getElementById("reportView").innerHTML=`
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:16px;flex-wrap:wrap">
-      <button class="btn" id="dlReport">Descargar reporte (HTML)</button>
-      <button class="btn" id="printReport">Imprimir / Guardar PDF</button>
+      <button class="btn primary" id="btnExport">⬇ Exportar reporte</button>
     </div>
-    <div class="reportdoc" style="background:var(--surface);border:1px solid var(--line);border-radius:14px;
-      padding:30px;box-shadow:var(--shadow)">
-      <style>${REPORT_CSS}</style>
-      ${reportBody(d)}
+    <div id="reportDoc" style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:30px;box-shadow:var(--shadow)">
+      <style>${REPORT_CSS}</style>${reportBody(d)}
     </div>`;
-  document.getElementById("printReport").onclick=()=>window.print();
-  document.getElementById("dlReport").onclick=()=>downloadReport(d);
+  document.getElementById("btnExport").onclick=()=>openPdfModal(d);
 }
-function downloadReport(d){
-  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reporte de cumplimiento — ${esc(d.sede)} — ${d.fecha}</title>
-<style>${REPORT_CSS}</style></head><body>${reportBody(d)}</body></html>`;
+
+//==================== PDF MODAL ====================
+let _rdCache=null;
+function openPdfModal(d){_rdCache=d;document.getElementById("pdfProgress").textContent="";document.getElementById("pdfOverlay").classList.add("show");}
+function closePdfModal(){document.getElementById("pdfOverlay").classList.remove("show");document.getElementById("pdfProgress").textContent="";}
+
+async function downloadPdf(d){
+  const prog=document.getElementById("pdfProgress");
+  const btn=document.getElementById("pdfDirect");
+  btn.disabled=true;btn.textContent="Generando…";prog.textContent="Preparando…";
+  const stamp=new Date().toISOString().slice(0,10);
+  const fullHtml=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><style>${REPORT_CSS} body{padding:20px}</style></head><body>${reportBody(d)}</body></html>`;
+  // Crear contenedor temporal oculto en el documento actual
+  const wrapper=document.createElement("div");
+  wrapper.style.cssText="position:fixed;left:-9999px;top:0;width:860px;pointer-events:none;";
+  wrapper.innerHTML=`<div style="font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:1.5;color:#1A1D1A;background:#fff;padding:20px">${reportBody(d)}</div>`;
+  document.body.appendChild(wrapper);
+  prog.textContent="Generando PDF…";
+  try{
+    await html2pdf().set({
+      margin:[10,8,10,8],
+      filename:`reporte-talleres-${stamp}.pdf`,
+      image:{type:"jpeg",quality:0.96},
+      html2canvas:{scale:2,useCORS:true,logging:false,windowWidth:860,backgroundColor:"#ffffff"},
+      jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}
+    }).from(wrapper.firstElementChild).save();
+    prog.textContent="✓ PDF descargado";
+    setTimeout(()=>closePdfModal(),1200);
+  }catch(err){
+    console.error("PDF error:",err);
+    prog.textContent="Error al generar el PDF. Usa 'Imprimir' y elige Guardar como PDF.";
+  }finally{
+    document.body.removeChild(wrapper);
+    btn.disabled=false;btn.textContent="⬇ Descargar PDF";
+  }
+}
+
+function downloadHtml(d){
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reporte — ${esc(d.sede)} — ${d.fecha}</title><style>${REPORT_CSS}</style></head><body>${reportBody(d)}</body></html>`;
   const blob=new Blob([html],{type:"text/html"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
-  const stamp=new Date().toISOString().slice(0,10);
-  a.href=url; a.download=`reporte-talleres-${stamp}.html`;
-  document.body.appendChild(a); a.click(); a.remove();
+  a.href=url;a.download=`reporte-talleres-${new Date().toISOString().slice(0,10)}.html`;
+  document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
-  toast("Reporte descargado");
+  toast("Reporte HTML descargado");closePdfModal();
 }
 
 //==================== VIEW SWITCH ====================
@@ -905,56 +778,54 @@ function setView(v){
 
 //==================== TOAST ====================
 let toastT=null;
-function toast(msg){
-  const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");
-  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("show"),2200);
-}
+function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("show"),2200);}
 
 //==================== INIT ====================
 async function init(){
   let loaded=null;
-  try{ await initFirebase(); loaded=await load(); }
-  catch(e){ console.error("Inicio de almacenamiento falló:",e); }
-  state = loaded || buildDefault();
-  // re-secuenciar ids para evitar choques
+  try{await initFirebase();loaded=await load();}catch(e){console.error("Inicio falló:",e);}
+  state=loaded||buildDefault();
   state.talleres.forEach(t=>t.items.forEach(it=>{if(!it.id)it.id=nid();}));
-  // si la nube está vacía en el primer uso, sembrar el estándar inicial
-  if(!loaded && fb.ready){ await storageSet(JSON.stringify(state)); }
+
+  // Migración: agregar BOD si el estado guardado no lo tiene
+  if(!state.talleres.find(t=>t.code==="BOD")){
+    state.talleres.push({code:"BOD",nombre:"Bodega",items:(SEED["BOD"]||[]).map(([eq,spec,std])=>({id:nid(),eq,spec,std,act:null}))});
+    save();
+  }
+
+  if(!loaded&&fb.ready)await storageSet(JSON.stringify(state));
 
   document.getElementById("sedeIn").value=state.sede||"";
   document.getElementById("sedeIn").oninput=function(){state.sede=this.value;save();};
-
-  if(state.noteHidden) document.getElementById("note").style.display="none";
-  document.getElementById("noteX").onclick=()=>{
-    document.getElementById("note").style.display="none";state.noteHidden=true;save();};
+  if(state.noteHidden)document.getElementById("note").style.display="none";
+  document.getElementById("noteX").onclick=()=>{document.getElementById("note").style.display="none";state.noteHidden=true;save();};
 
   document.getElementById("vTalleres").onclick=()=>setView("talleres");
   document.getElementById("vPlan").onclick=()=>setView("plan");
   document.getElementById("vReporte").onclick=()=>setView("reporte");
-
   document.getElementById("reloadBtn").onclick=async()=>{
-    if(pendingRemote){ doApplyRemote(pendingRemote); }
-    else { const raw=await storageGet(); if(raw)doApplyRemote(raw); }
+    if(pendingRemote)doApplyRemote(pendingRemote);
+    else{const raw=await storageGet();if(raw)doApplyRemote(raw);}
     toast("Datos actualizados");
   };
-
   document.getElementById("resetBtn").onclick=async()=>{
-    if(!confirm("¿Reiniciar todo? Se borrarán las cantidades actuales y los cambios al estándar, volviendo a la asignación provisional inicial."))return;
-    state=buildDefault();
-    await storageSet(JSON.stringify(state));
-    document.getElementById("sedeIn").value="";
-    document.getElementById("note").style.display="";
+    if(!confirm("¿Reiniciar todo? Se borrarán las cantidades actuales y los cambios al estándar."))return;
+    state=buildDefault();await storageSet(JSON.stringify(state));
+    document.getElementById("sedeIn").value="";document.getElementById("note").style.display="";
     current="500A";setView("talleres");renderTabs();renderPanel();refreshGlobal();toast("Restablecido");
   };
 
-  // al terminar de editar un campo, aplica cambios remotos que quedaron en espera
-  document.addEventListener("focusout",()=>setTimeout(()=>{
-    if(pendingRemote && !inputFocused()) doApplyRemote(pendingRemote);
-  },200));
+  // PDF modal
+  document.getElementById("pdfClose").onclick=closePdfModal;
+  document.getElementById("pdfOverlay").onclick=e=>{if(e.target===document.getElementById("pdfOverlay"))closePdfModal();};
+  document.getElementById("pdfDirect").onclick=()=>downloadPdf(_rdCache);
+  document.getElementById("pdfPrint").onclick=()=>{closePdfModal();setTimeout(()=>window.print(),200);};
+  document.getElementById("pdfHtml").onclick=()=>downloadHtml(_rdCache);
 
-  renderTabs();renderPanel();refreshGlobal();setView("talleres");
-  setSyncStatus("");
-  if(fb.ready){ document.getElementById("reloadBtn").style.display=""; listenFirebase(); }
+  document.addEventListener("focusout",()=>setTimeout(()=>{if(pendingRemote&&!inputFocused())doApplyRemote(pendingRemote);},200));
+
+  renderTabs();renderPanel();refreshGlobal();setView("talleres");setSyncStatus("");
+  if(fb.ready){document.getElementById("reloadBtn").style.display="";listenFirebase();}
 }
 init();
 </script>
