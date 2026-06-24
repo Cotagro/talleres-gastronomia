@@ -376,7 +376,13 @@ const SEED={
 //==================== STATE ====================
 const STORE_KEY="estandar_talleres_v1";
 let state=null, current="500A", view="talleres";
-let _id=0; const nid=()=>"i"+(++_id);
+
+// ── CORRECCIÓN: nid() usa timestamp + random para garantizar unicidad
+//    incluso entre recargas de página, evitando colisiones de IDs.
+let _nidBase = Date.now().toString(36);
+let _nidSeq  = 0;
+const nid = () => _nidBase + "-" + (++_nidSeq).toString(36);
+
 let storageMode="memory";
 
 function buildDefault(){
@@ -388,16 +394,23 @@ function buildDefault(){
     }))
   };
 }
-// asegura campos nuevos en cada item
+
+// ── CORRECCIÓN: ensureFields detecta y repara IDs duplicados al cargar.
+//    Se mantiene un Set global de IDs ya vistos; cualquier duplicado recibe
+//    un ID nuevo único en su lugar.
+const _seenIds = new Set();
 function ensureFields(it){
-  if(!it.id)it.id=nid();
+  if(!it.id || _seenIds.has(it.id)){
+    // ID ausente o duplicado → generar uno nuevo único
+    it.id = nid();
+  }
+  _seenIds.add(it.id);
   if(typeof it.rev==="undefined")it.rev=false;
   if(typeof it.revNota==="undefined")it.revNota="";
   return it;
 }
+
 // MIGRACIÓN central: agrega Bodega si falta y normaliza los items.
-// Se aplica a TODO estado que entra (carga inicial y sincronización en vivo),
-// para que el listener de Firebase no borre la Bodega ni los campos de revisión.
 function migrate(s){
   if(!s||typeof s!=="object")return buildDefault();
   if(!Array.isArray(s.talleres))s.talleres=[];
@@ -461,8 +474,10 @@ function applyRemote(json){if(inputFocused()){pendingRemote=json;setSyncStatus("
 function doApplyRemote(json){
   let s;try{s=JSON.parse(json);}catch(e){return;}
   const hadBod = !!(s.talleres&&s.talleres.find(t=>t.code==="BOD"));
+  // ── Limpiar el Set de IDs antes de migrar el estado remoto,
+  //    así ensureFields puede volver a detectar duplicados en el nuevo estado.
+  _seenIds.clear();
   state=migrate(s);pendingRemote=null;
-  // Si el estado remoto venía sin Bodega/campos nuevos, lo re-guardamos ya migrado.
   if(!hadBod) save();
   const sin=document.getElementById("sedeIn");if(sin)sin.value=state.sede||"";
   renderTabs();
@@ -862,9 +877,10 @@ async function init(){
   let loaded=null;
   try{await initFirebase();loaded=await load();}catch(e){console.error("Inicio falló:",e);}
   const hadBod = !!(loaded&&loaded.talleres&&loaded.talleres.find(t=>t.code==="BOD"));
+  // ── Limpiar _seenIds antes de la migración inicial
+  _seenIds.clear();
   state=migrate(loaded||buildDefault());
 
-  // Guardar el estado ya migrado (con Bodega y campos de revisión)
   if(!loaded || !hadBod){ await storageSet(JSON.stringify(state)); }
 
   document.getElementById("sedeIn").value=state.sede||"";
@@ -882,6 +898,7 @@ async function init(){
   };
   document.getElementById("resetBtn").onclick=async()=>{
     if(!confirm("¿Reiniciar todo? Se borrarán las cantidades actuales, las revisiones y los cambios al estándar."))return;
+    _seenIds.clear();
     state=buildDefault();await storageSet(JSON.stringify(state));
     document.getElementById("sedeIn").value="";document.getElementById("note").style.display="";
     current="500A";setView("talleres");renderTabs();renderPanel();refreshGlobal();toast("Restablecido");
@@ -903,3 +920,4 @@ init();
 </script>
 </body>
 </html>
+
