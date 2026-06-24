@@ -16,6 +16,7 @@
     --ok:#15803D; --ok-soft:#E6F2EA;
     --warn:#B45309; --warn-soft:#F7EDDD;
     --bad:#B91C1C; --bad-soft:#F8E5E2;
+    --rev:#7C3AED; --rev-soft:#F0EAFB;
     --none:#9AA0A6; --none-soft:#EFEEEB;
     --shadow:0 1px 2px rgba(20,25,20,.05),0 8px 24px rgba(20,25,20,.04);
   }
@@ -27,7 +28,6 @@
   button{font-family:inherit;cursor:pointer}
   input,select,textarea{font-family:inherit}
 
-  /* top bar */
   header{position:sticky;top:0;z-index:30;background:rgba(247,246,243,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
   .bar{max-width:1180px;margin:0 auto;padding:16px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
   .brand{display:flex;flex-direction:column;gap:2px;margin-right:auto}
@@ -50,20 +50,17 @@
   .syncchip.on{color:var(--ok);border-color:#BFE0CB;background:var(--ok-soft)}
   .syncchip.warn{color:var(--warn);border-color:#E9D5B4;background:var(--warn-soft)}
 
-  /* view switch */
   .views{max-width:1180px;margin:0 auto;padding:0 22px;display:flex;gap:6px;border-bottom:1px solid var(--line)}
   .vtab{border:none;background:transparent;padding:13px 4px;margin-right:18px;color:var(--muted);font-weight:600;font-size:13.5px;border-bottom:2px solid transparent;margin-bottom:-1px}
   .vtab.on{color:var(--ink);border-bottom-color:var(--accent)}
 
   main{max-width:1180px;margin:0 auto;padding:22px}
 
-  /* banner */
   .note{display:flex;gap:12px;align-items:flex-start;background:var(--warn-soft);border:1px solid #E9D5B4;border-radius:12px;padding:13px 15px;margin-bottom:20px;font-size:13px;color:#6b4413}
   .note b{color:#5a3a10}
   .note .x{margin-left:auto;border:none;background:transparent;color:#9c7a3f;font-size:17px;line-height:1;padding:0 2px}
   .note svg{flex:0 0 18px;margin-top:1px}
 
-  /* taller tabs */
   .ttabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;scrollbar-width:thin}
   .ttab{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:10px 14px;text-align:left;min-width:118px;transition:.12s}
   .ttab:hover{border-color:var(--line-strong)}
@@ -74,7 +71,6 @@
   .ttab .mini i{display:block;height:100%;background:var(--ok)}
   .ttab .pct{font:600 10.5px/1 "JetBrains Mono";color:var(--muted);margin-top:5px;display:block}
 
-  /* taller panel */
   .thead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
   .thead .tt{display:flex;flex-direction:column;gap:3px;margin-right:auto}
   .thead .tt .tcode{font:700 13px/1 "Space Grotesk";color:var(--accent);letter-spacing:.04em}
@@ -82,24 +78,26 @@
   .nm-in:hover{border-bottom-color:var(--line-strong)}
   .nm-in:focus{outline:none;border-bottom-color:var(--accent)}
   .kpis{display:flex;gap:10px;flex-wrap:wrap}
-  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 14px;min-width:92px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 14px;min-width:88px}
   .kpi b{font:600 20px/1 "Space Grotesk";display:block}
   .kpi span{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-  .kpi.ok b{color:var(--ok)} .kpi.bad b{color:var(--bad)} .kpi.none b{color:var(--none)}
+  .kpi.ok b{color:var(--ok)} .kpi.bad b{color:var(--bad)} .kpi.none b{color:var(--none)} .kpi.rev b{color:var(--rev)}
   .meter{height:8px;border-radius:5px;background:var(--none-soft);overflow:hidden;margin:16px 0 6px}
   .meter i{display:block;height:100%;background:var(--ok);transition:width .35s}
   .meterlbl{font-size:11.5px;color:var(--muted);margin-bottom:18px}
 
-  /* table */
   .tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
   .scroll{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;min-width:720px}
+  table{width:100%;border-collapse:collapse;min-width:840px}
   thead th{font:600 10.5px/1 "Space Grotesk";letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);background:#FBFAF7;position:sticky;top:0}
   th.num,td.num{text-align:center;width:74px}
   th.act,td.act{width:96px}
+  th.rev,td.rev{width:180px}
   td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
   tbody tr:last-child td{border-bottom:none}
   tbody tr:hover{background:#FCFBF8}
+  tbody tr.is-rev{background:#FBF8FF}
+  tbody tr.is-rev:hover{background:#F6F0FF}
   .eq{font-weight:600;font-size:13.5px}
   .spectoggle{border:none;background:transparent;color:var(--accent);font-size:11.5px;font-weight:600;padding:3px 0;margin-top:2px}
   .spec{font-size:12px;color:var(--muted);margin-top:6px;max-width:540px;display:none;white-space:pre-wrap}
@@ -114,6 +112,14 @@
   .b-bad{background:var(--bad-soft);color:var(--bad)}
   .b-none{background:var(--none-soft);color:#5f6368}
   .b-exc{background:var(--accent-soft);color:var(--accent-ink)}
+
+  .revtog{border:1px solid var(--line-strong);background:var(--surface);color:var(--muted);border-radius:999px;padding:5px 11px;font:600 11.5px/1 "Inter";display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .revtog svg{width:13px;height:13px}
+  .revtog:hover{border-color:var(--rev);color:var(--rev)}
+  .revtog.on{background:var(--rev-soft);border-color:#D6C7F5;color:var(--rev)}
+  .revnota{margin-top:7px;width:100%;border:1px solid var(--line-strong);border-radius:8px;padding:6px 8px;font-size:12px;background:var(--surface);resize:vertical;min-height:34px}
+  .revnota:focus{outline:none;border-color:var(--rev);box-shadow:0 0 0 3px var(--rev-soft)}
+
   .rowact{display:flex;gap:4px;justify-content:flex-end}
   .iconbtn{border:1px solid transparent;background:transparent;color:var(--muted);border-radius:7px;padding:5px;line-height:0}
   .iconbtn:hover{background:var(--bg);color:var(--ink)}
@@ -131,7 +137,6 @@
   .empty{padding:48px 22px;text-align:center;color:var(--muted)}
   .empty h3{font-size:16px;color:var(--ink);margin-bottom:6px}
 
-  /* plan */
   .planhead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
   .planhead h2{font-size:24px;margin-right:auto}
   .plangrp{margin-bottom:22px}
@@ -147,7 +152,6 @@
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:.25s;z-index:60;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  /* PDF modal */
   #pdfOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:center;justify-content:center}
   #pdfOverlay.show{display:flex}
   #pdfBox{background:#fff;border-radius:16px;padding:28px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -178,6 +182,7 @@
     <div class="global">
       <div class="gstat"><b class="mono" id="gPct">—</b><span>Cumplimiento</span></div>
       <div class="gstat"><b class="mono" id="gFalt" style="color:var(--bad)">—</b><span>Unid. faltantes</span></div>
+      <div class="gstat"><b class="mono" id="gRev" style="color:var(--rev)">—</b><span>En revisión</span></div>
       <span class="syncchip" id="syncChip">Local</span>
       <button class="btn ghost" id="reloadBtn" style="display:none">Sincronizar</button>
       <button class="btn ghost danger" id="resetBtn">Reiniciar</button>
@@ -193,7 +198,7 @@
 <main>
   <div class="note" id="note">
     <svg viewBox="0 0 24 24" fill="none" stroke="#b07a2a" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0Z"/></svg>
-    <div><b>Asignación de talleres provisional.</b> La lista original no traía la columna de taller, así que los equipos se agruparon por función. Verifica cada sala y mueve, edita o elimina lo que no corresponda. El <b>503</b> está vacío a la espera de tus datos. Todo lo que ingreses se guarda automáticamente.</div>
+    <div><b>Asignación de talleres provisional.</b> La lista original no traía la columna de taller, así que los equipos se agruparon por función. Verifica cada sala y mueve, edita o elimina lo que no corresponda. El <b>503</b> está vacío a la espera de tus datos. Usa <b>"Marcar revisión"</b> para equipos depreciados o de mantención costosa cuya continuidad se debe evaluar. Todo se guarda automáticamente.</div>
     <button class="x" id="noteX">×</button>
   </div>
   <div id="tallerView">
@@ -204,7 +209,6 @@
   <div id="reportView" style="display:none"></div>
 </main>
 
-<!-- Modal exportar PDF -->
 <div id="pdfOverlay">
   <div id="pdfBox">
     <h3>Exportar reporte</h3>
@@ -380,9 +384,31 @@ function buildDefault(){
     sede:"",noteHidden:false,
     talleres:TALLER_DEFS.map(d=>({
       code:d.code,nombre:d.nombre,
-      items:(SEED[d.code]||[]).map(([eq,spec,std])=>({id:nid(),eq,spec,std,act:null}))
+      items:(SEED[d.code]||[]).map(([eq,spec,std])=>({id:nid(),eq,spec,std,act:null,rev:false,revNota:""}))
     }))
   };
+}
+// asegura campos nuevos en cada item
+function ensureFields(it){
+  if(!it.id)it.id=nid();
+  if(typeof it.rev==="undefined")it.rev=false;
+  if(typeof it.revNota==="undefined")it.revNota="";
+  return it;
+}
+// MIGRACIÓN central: agrega Bodega si falta y normaliza los items.
+// Se aplica a TODO estado que entra (carga inicial y sincronización en vivo),
+// para que el listener de Firebase no borre la Bodega ni los campos de revisión.
+function migrate(s){
+  if(!s||typeof s!=="object")return buildDefault();
+  if(!Array.isArray(s.talleres))s.talleres=[];
+  if(!s.talleres.find(t=>t.code==="BOD")){
+    s.talleres.push({
+      code:"BOD",nombre:"Bodega",
+      items:(SEED["BOD"]||[]).map(([eq,spec,std])=>({id:nid(),eq,spec,std,act:null,rev:false,revNota:""}))
+    });
+  }
+  s.talleres.forEach(t=>{ if(!Array.isArray(t.items))t.items=[]; t.items.forEach(ensureFields); });
+  return s;
 }
 
 //==================== PERSISTENCE ====================
@@ -430,12 +456,14 @@ function listenFirebase(){
     applyRemote(json);
   },err=>console.error("onSnapshot:",err));
 }
-function inputFocused(){const a=document.activeElement;return !!(a&&(a.classList.contains("actin")||a.classList.contains("nm-in")||a.classList.contains("sede-in")||(a.closest&&a.closest(".addform"))));}
+function inputFocused(){const a=document.activeElement;return !!(a&&(a.classList.contains("actin")||a.classList.contains("nm-in")||a.classList.contains("sede-in")||a.classList.contains("revnota")||(a.closest&&a.closest(".addform"))));}
 function applyRemote(json){if(inputFocused()){pendingRemote=json;setSyncStatus("Cambios nuevos");return;}doApplyRemote(json);}
 function doApplyRemote(json){
   let s;try{s=JSON.parse(json);}catch(e){return;}
-  state=s;pendingRemote=null;
-  state.talleres.forEach(t=>t.items.forEach(it=>{if(!it.id)it.id=nid();}));
+  const hadBod = !!(s.talleres&&s.talleres.find(t=>t.code==="BOD"));
+  state=migrate(s);pendingRemote=null;
+  // Si el estado remoto venía sin Bodega/campos nuevos, lo re-guardamos ya migrado.
+  if(!hadBod) save();
   const sin=document.getElementById("sedeIn");if(sin)sin.value=state.sede||"";
   renderTabs();
   if(view==="talleres")renderPanel();else if(view==="plan")renderPlan();else if(view==="reporte")renderReport();
@@ -458,20 +486,21 @@ function statusOf(it){
   return{key:"warn",label:"Faltan "+(it.std-a),cls:"b-warn",gap:it.std-a};
 }
 function tallerStats(t){
-  let cumple=0,pend=0,gap=0,conGap=0;
-  t.items.forEach(it=>{const s=statusOf(it);if(s.key==="none")pend++;else if(s.gap===0)cumple++;if(s.gap>0){gap+=s.gap;conGap++;}});
+  let cumple=0,pend=0,gap=0,conGap=0,rev=0;
+  t.items.forEach(it=>{const s=statusOf(it);if(s.key==="none")pend++;else if(s.gap===0)cumple++;if(s.gap>0){gap+=s.gap;conGap++;}if(it.rev)rev++;});
   const total=t.items.length,evaluados=total-pend;
   const pct=evaluados?Math.round(cumple/evaluados*100):(total?0:100);
-  return{total,cumple,pend,gap,conGap,evaluados,pct};
+  return{total,cumple,pend,gap,conGap,rev,evaluados,pct};
 }
 function globalStats(){
-  let gap=0,cumple=0,evaluados=0;
-  state.talleres.forEach(t=>{const s=tallerStats(t);gap+=s.gap;cumple+=s.cumple;evaluados+=s.evaluados;});
-  return{gap,pct:evaluados?Math.round(cumple/evaluados*100):0};
+  let gap=0,cumple=0,evaluados=0,rev=0;
+  state.talleres.forEach(t=>{const s=tallerStats(t);gap+=s.gap;cumple+=s.cumple;evaluados+=s.evaluados;rev+=s.rev;});
+  return{gap,rev,pct:evaluados?Math.round(cumple/evaluados*100):0};
 }
 const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function knownCatalog(){const m=new Map();Object.values(SEED).flat().forEach(([eq,spec])=>{if(!m.has(eq))m.set(eq,spec);});return m;}
 const CATALOG=knownCatalog();
+const REV_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>';
 
 //==================== TABS ====================
 function renderTabs(){
@@ -494,7 +523,7 @@ function renderPanel(){
   const panel=document.getElementById("panel");
   let rows=!t.items.length
     ?`<div class="empty"><h3>Taller sin equipos asignados</h3><p>Agrega los equipos del estándar para este taller, o muévelos desde otra sala.</p></div>`
-    :`<div class="scroll"><table><thead><tr><th>Equipo</th><th class="num">Estándar</th><th class="act">Actual</th><th>Estado</th><th style="text-align:right">Acciones</th></tr></thead><tbody>${t.items.map(it=>rowHTML(it)).join("")}</tbody></table></div>`;
+    :`<div class="scroll"><table><thead><tr><th>Equipo</th><th class="num">Estándar</th><th class="act">Actual</th><th>Estado</th><th class="rev">Revisión</th><th style="text-align:right">Acciones</th></tr></thead><tbody>${t.items.map(it=>rowHTML(it)).join("")}</tbody></table></div>`;
 
   panel.innerHTML=`
     <div class="thead">
@@ -504,6 +533,7 @@ function renderPanel(){
         <div class="kpi ok"><b>${s.cumple}</b><span>Cumple</span></div>
         <div class="kpi bad"><b>${s.conGap}</b><span>Con brecha</span></div>
         <div class="kpi none"><b>${s.pend}</b><span>Por revisar</span></div>
+        <div class="kpi rev"><b>${s.rev}</b><span>En revisión</span></div>
         <div class="kpi"><b class="mono" style="color:var(--bad)">${s.gap}</b><span>Unid. faltantes</span></div>
       </div>
     </div>
@@ -543,8 +573,20 @@ function renderPanel(){
   panel.querySelectorAll(".spectoggle").forEach(b=>{
     b.onclick=()=>{const sp=b.nextElementSibling;sp.classList.toggle("show");b.textContent=sp.classList.contains("show")?"Ocultar especificación":"Ver especificación";};
   });
+  // toggle revisión
+  panel.querySelectorAll(".revtog").forEach(b=>{
+    b.onclick=()=>{
+      const it=t.items.find(x=>x.id===b.dataset.id);
+      it.rev=!it.rev; if(!it.rev)it.revNota="";
+      save(); renderPanel(); renderTabs(); refreshGlobal();
+    };
+  });
+  // comentario de revisión
+  panel.querySelectorAll(".revnota").forEach(inp=>{
+    inp.oninput=()=>{ const it=t.items.find(x=>x.id===inp.dataset.id); it.revNota=inp.value; save(); };
+  });
   panel.querySelectorAll(".del").forEach(b=>{
-    b.onclick=()=>{t.items=t.items.filter(x=>x.id!==b.dataset.id);save();renderPanel();renderTabs();};
+    b.onclick=()=>{t.items=t.items.filter(x=>x.id!==b.dataset.id);save();renderPanel();renderTabs();refreshGlobal();};
   });
   panel.querySelectorAll(".movesel").forEach(sel=>{
     sel.onchange=()=>{
@@ -565,18 +607,20 @@ function renderPanel(){
     const std=Math.max(1,Math.floor(Number(document.getElementById("aStd").value)||1));
     const actRaw=document.getElementById("aAct").value;
     const act=actRaw===""?null:Math.max(0,Math.floor(Number(actRaw)||0));
-    t.items.push({id:nid(),eq,spec,std,act});
+    t.items.push({id:nid(),eq,spec,std,act,rev:false,revNota:""});
     save();renderPanel();renderTabs();toast("Equipo agregado");
   };
 }
 function rowHTML(it){
   const st=statusOf(it);
   const moveOpts=state.talleres.filter(x=>x.code!==current).map(x=>`<option value="${x.code}">${x.code}</option>`).join("");
-  return`<tr data-row="${it.id}">
+  const revCell=`<button class="revtog ${it.rev?'on':''}" data-id="${it.id}">${REV_SVG}${it.rev?'En revisión':'Marcar revisión'}</button>${it.rev?`<textarea class="revnota" data-id="${it.id}" placeholder="¿Por qué? (depreciada, mantención costosa, evaluar continuidad…)">${esc(it.revNota)}</textarea>`:""}`;
+  return`<tr data-row="${it.id}" class="${it.rev?'is-rev':''}">
     <td><div class="eq">${esc(it.eq)}</div>${it.spec?`<button class="spectoggle">Ver especificación</button><div class="spec">${esc(it.spec)}</div>`:""}</td>
     <td class="num"><input class="actin stdin" data-id="${it.id}" type="number" min="0" value="${it.std}" style="border-style:solid;color:var(--muted)"></td>
     <td class="act"><input class="actin ${it.act===null?'empty':''}" data-id="${it.id}" type="number" min="0" placeholder="—" value="${it.act===null?'':it.act}"></td>
     <td><span class="badge ${st.cls}" data-badge="${it.id}">${st.label}</span></td>
+    <td class="rev">${revCell}</td>
     <td><div class="rowact">
       <select class="movesel" data-id="${it.id}" title="Mover a otro taller"><option value="">Mover…</option>${moveOpts}</select>
       <button class="iconbtn del" data-id="${it.id}" title="Eliminar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
@@ -591,7 +635,7 @@ function refreshRow(it){
 function refreshHead(){
   const t=tallerByCode(current),s=tallerStats(t);
   const k=document.querySelectorAll(".kpi b");
-  if(k.length>=4){k[0].textContent=s.cumple;k[1].textContent=s.conGap;k[2].textContent=s.pend;k[3].textContent=s.gap;}
+  if(k.length>=5){k[0].textContent=s.cumple;k[1].textContent=s.conGap;k[2].textContent=s.pend;k[3].textContent=s.rev;k[4].textContent=s.gap;}
   const mi=document.querySelector(".meter i");
   if(mi){mi.style.width=s.pct+"%";mi.style.background=s.pct>=85?'var(--ok)':s.pct>=50?'var(--warn)':'var(--bad)';}
   const ml=document.querySelector(".meterlbl");
@@ -602,6 +646,7 @@ function refreshGlobal(){
   const g=globalStats();
   document.getElementById("gPct").textContent=g.pct+"%";
   document.getElementById("gFalt").textContent=g.gap;
+  document.getElementById("gRev").textContent=g.rev;
 }
 
 //==================== PLAN ====================
@@ -610,11 +655,14 @@ function renderPlan(){
   const groups=state.talleres.map(t=>{
     const items=t.items.map(it=>({it,st:statusOf(it)})).filter(o=>o.st.gap>0);
     const pend=t.items.filter(it=>statusOf(it).key==="none").length;
-    return{t,items,pend};
+    const revs=t.items.filter(it=>it.rev);
+    return{t,items,pend,revs};
   });
   const totalGap=groups.reduce((a,g)=>a+g.items.reduce((x,o)=>x+o.st.gap,0),0);
   const totalLineas=groups.reduce((a,g)=>a+g.items.length,0);
   const totalPend=groups.reduce((a,g)=>a+g.pend,0);
+  const totalRev=groups.reduce((a,g)=>a+g.revs.length,0);
+
   let body=totalLineas===0
     ?`<div class="planok">No hay brechas registradas. Todos los equipos revisados cumplen el estándar.${totalPend?`<div class="pendwarn">Quedan ${totalPend} equipos por revisar.</div>`:""}</div>`
     :groups.filter(g=>g.items.length).map(g=>{
@@ -624,18 +672,34 @@ function renderPlan(){
         <tbody>${g.items.map(o=>`<tr><td><div class="eq">${esc(o.it.eq)}</div>${o.it.spec?`<div class="spec show" style="margin-top:4px">${esc(o.it.spec)}</div>`:""}</td><td class="num mono std">${o.it.std}</td><td class="num mono">${o.it.act}</td><td class="num pq">${o.st.gap}</td></tr>`).join("")}</tbody>
         </table></div></div></div>`;
     }).join("");
+
+  // sección equipos en revisión
+  let revBody="";
+  if(totalRev>0){
+    revBody=`<div class="plangrp" style="margin-top:30px">
+      <h3 style="color:var(--rev)"><span class="tag" style="color:var(--rev);background:var(--rev-soft)">REVISIÓN</span> Equipos a evaluar <small>· depreciación o alto costo de mantención · ${totalRev} equipos</small></h3>`;
+    groups.filter(g=>g.revs.length).forEach(g=>{
+      revBody+=`<div class="plantable" style="margin-bottom:12px"><div class="scroll"><table>
+        <thead><tr><th>${g.t.code} · ${esc(g.t.nombre)}</th><th>Motivo / comentario</th></tr></thead>
+        <tbody>${g.revs.map(it=>`<tr><td><div class="eq">${esc(it.eq)}</div></td><td>${esc(it.revNota)||'<span style="color:var(--muted)">— sin comentario —</span>'}</td></tr>`).join("")}</tbody>
+      </table></div></div>`;
+    });
+    revBody+=`</div>`;
+  }
+
   v.innerHTML=`
     <div class="planhead"><h2>Plan de inversión · brechas</h2>
       <div class="kpis">
         <div class="kpi bad"><b class="mono">${totalGap}</b><span>Unid. faltantes</span></div>
         <div class="kpi"><b class="mono">${totalLineas}</b><span>Equipos con brecha</span></div>
+        <div class="kpi rev"><b>${totalRev}</b><span>En revisión</span></div>
         <div class="kpi none"><b>${totalPend}</b><span>Por revisar</span></div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn" id="copyPlan">Copiar listado</button>
         <button class="btn" id="printPlan">Imprimir / PDF</button>
       </div>
-    </div>${body}`;
+    </div>${body}${revBody}`;
   document.getElementById("printPlan").onclick=()=>window.print();
   document.getElementById("copyPlan").onclick=()=>copyPlan(groups);
 }
@@ -648,6 +712,14 @@ function copyPlan(groups){
     g.items.forEach(o=>{txt+=`  • ${o.it.eq}: faltan ${o.st.gap} (estándar ${o.it.std}, actual ${o.it.act})\n`;});txt+=`\n`;
   });
   if(!any)txt+="Sin brechas registradas.\n";
+  const revGroups=groups.filter(g=>g.revs.length);
+  if(revGroups.length){
+    txt+=`\nEQUIPOS EN REVISIÓN (depreciación / mantención costosa)\n`;
+    revGroups.forEach(g=>{
+      txt+=`TALLER ${g.t.code} — ${g.t.nombre}\n`;
+      g.revs.forEach(it=>{txt+=`  • ${it.eq}${it.revNota?` — ${it.revNota}`:""}\n`;});txt+=`\n`;
+    });
+  }
   navigator.clipboard.writeText(txt).then(()=>toast("Listado copiado al portapapeles")).catch(()=>toast("No se pudo copiar"));
 }
 
@@ -662,10 +734,10 @@ const REPORT_CSS=`
   .rkpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:22px 0}
   .rk{border:1px solid #E4E2DB;border-radius:10px;padding:11px 13px}
   .rk b{display:block;font-size:21px;letter-spacing:-.02em}.rk span{font-size:10px;color:#6E7268;text-transform:uppercase;letter-spacing:.04em}
-  .rk.ok b{color:#15803D}.rk.bad b{color:#B91C1C}
+  .rk.ok b{color:#15803D}.rk.bad b{color:#B91C1C}.rk.rev b{color:#7C3AED}
   table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#6E7268;padding:8px 9px;border-bottom:1px solid #D2CFC6}
   td{padding:8px 9px;border-bottom:1px solid #EFEEEB}th.n,td.n{text-align:center}th.c,td.c{text-align:center}
-  td.ok{color:#15803D}td.bad{color:#B91C1C}.resumen tbody tr:last-child td{border-bottom:1px solid #D2CFC6}
+  td.ok{color:#15803D}td.bad{color:#B91C1C}td.rv{color:#7C3AED}.resumen tbody tr:last-child td{border-bottom:1px solid #D2CFC6}
   .det{margin-bottom:6px}.okmsg{background:#E6F2EA;color:#15803D;border-radius:8px;padding:14px;font-weight:600}
   .foot{font-size:11px;color:#6E7268;margin-top:14px}
   @media (max-width:620px){.rkpis{grid-template-columns:repeat(3,1fr)}}
@@ -674,20 +746,28 @@ const REPORT_CSS=`
 function reportData(){
   const fecha=new Date().toLocaleDateString("es-CL",{day:"numeric",month:"long",year:"numeric"});
   const g=globalStats();
-  let totalEq=0,totalCumple=0,totalGap=0,totalPend=0,totalConGap=0;
+  let totalEq=0,totalCumple=0,totalGap=0,totalPend=0,totalConGap=0,totalRev=0;
   const talleres=state.talleres.map(t=>{
-    const s=tallerStats(t);totalEq+=s.total;totalCumple+=s.cumple;totalGap+=s.gap;totalPend+=s.pend;totalConGap+=s.conGap;
+    const s=tallerStats(t);totalEq+=s.total;totalCumple+=s.cumple;totalGap+=s.gap;totalPend+=s.pend;totalConGap+=s.conGap;totalRev+=s.rev;
     const gaps=t.items.map(it=>({it,st:statusOf(it)})).filter(o=>o.st.gap>0);
-    return{t,s,gaps};
+    const revs=t.items.filter(it=>it.rev);
+    return{t,s,gaps,revs};
   });
-  return{fecha,sede:state.sede||"—",gPct:g.pct,totalEq,totalCumple,totalGap,totalPend,totalConGap,talleres};
+  return{fecha,sede:state.sede||"—",gPct:g.pct,totalEq,totalCumple,totalGap,totalPend,totalConGap,totalRev,talleres};
 }
 function reportBody(d){
-  const resumenRows=d.talleres.map(o=>`<tr><td class="c"><b>${o.t.code}</b></td><td>${esc(o.t.nombre)||"—"}</td><td class="n">${o.s.total}</td><td class="n ok">${o.s.cumple}</td><td class="n bad">${o.s.conGap}</td><td class="n">${o.s.pend}</td><td class="n bad"><b>${o.s.gap}</b></td><td class="n">${o.s.total?o.s.pct+"%":"—"}</td></tr>`).join("");
+  const resumenRows=d.talleres.map(o=>`<tr><td class="c"><b>${o.t.code}</b></td><td>${esc(o.t.nombre)||"—"}</td><td class="n">${o.s.total}</td><td class="n ok">${o.s.cumple}</td><td class="n bad">${o.s.conGap}</td><td class="n rv">${o.s.rev}</td><td class="n">${o.s.pend}</td><td class="n bad"><b>${o.s.gap}</b></td><td class="n">${o.s.total?o.s.pct+"%":"—"}</td></tr>`).join("");
   const detalle=d.talleres.filter(o=>o.gaps.length).map(o=>`
     <h3>Taller ${o.t.code} · ${esc(o.t.nombre)} <small>— faltan ${o.gaps.reduce((a,x)=>a+x.st.gap,0)} unidades</small></h3>
     <table class="det"><thead><tr><th>Equipo</th><th class="n">Estándar</th><th class="n">Actual</th><th class="n">Faltan</th></tr></thead>
     <tbody>${o.gaps.map(x=>`<tr><td>${esc(x.it.eq)}</td><td class="n">${x.it.std}</td><td class="n">${x.it.act}</td><td class="n bad"><b>${x.st.gap}</b></td></tr>`).join("")}</tbody></table>`).join("");
+  const revGroups=d.talleres.filter(o=>o.revs.length);
+  const revBlock=revGroups.length?`
+    <h2>Equipos en revisión (depreciación / mantención)</h2>
+    ${revGroups.map(o=>`
+      <h3>Taller ${o.t.code} · ${esc(o.t.nombre)} <small>— ${o.revs.length} equipos a evaluar</small></h3>
+      <table class="det"><thead><tr><th>Equipo</th><th>Motivo / comentario</th></tr></thead>
+      <tbody>${o.revs.map(it=>`<tr><td>${esc(it.eq)}</td><td>${esc(it.revNota)||"—"}</td></tr>`).join("")}</tbody></table>`).join("")}`:"";
   return`
     <div class="rhead"><div><div class="reye">Estándar de sede · Gastronomía</div><h1>Reporte de cumplimiento de equipamiento</h1></div>
       <div class="rmeta"><div><span>Sede</span><b>${esc(d.sede)}</b></div><div><span>Fecha</span><b>${d.fecha}</b></div></div></div>
@@ -696,13 +776,14 @@ function reportBody(d){
       <div class="rk"><b>${d.totalEq}</b><span>Equipos del estándar</span></div>
       <div class="rk ok"><b>${d.totalCumple}</b><span>Cumplen</span></div>
       <div class="rk bad"><b>${d.totalConGap}</b><span>Con brecha</span></div>
+      <div class="rk rev"><b>${d.totalRev}</b><span>En revisión</span></div>
       <div class="rk bad"><b>${d.totalGap}</b><span>Unidades faltantes</span></div>
-      <div class="rk"><b>${d.totalPend}</b><span>Por revisar</span></div>
     </div>
     <h2>Resumen por taller</h2>
-    <table class="resumen"><thead><tr><th class="c">Taller</th><th>Nombre</th><th class="n">Equipos</th><th class="n">Cumple</th><th class="n">Brecha</th><th class="n">Por rev.</th><th class="n">Faltan</th><th class="n">% cumpl.</th></tr></thead><tbody>${resumenRows}</tbody></table>
+    <table class="resumen"><thead><tr><th class="c">Taller</th><th>Nombre</th><th class="n">Equipos</th><th class="n">Cumple</th><th class="n">Brecha</th><th class="n">Revisión</th><th class="n">Por rev.</th><th class="n">Faltan</th><th class="n">% cumpl.</th></tr></thead><tbody>${resumenRows}</tbody></table>
     <h2>Detalle de brechas (para inversión)</h2>
     ${detalle||`<p class="okmsg">No hay brechas registradas en los equipos revisados.</p>`}
+    ${revBlock}
     ${d.totalPend?`<p class="foot">Nota: ${d.totalPend} equipos aún no han sido revisados.</p>`:""}
     <p class="foot">Asignación de talleres provisional, generada a partir del estándar de sede.</p>`;
 }
@@ -722,14 +803,11 @@ function renderReport(){
 let _rdCache=null;
 function openPdfModal(d){_rdCache=d;document.getElementById("pdfProgress").textContent="";document.getElementById("pdfOverlay").classList.add("show");}
 function closePdfModal(){document.getElementById("pdfOverlay").classList.remove("show");document.getElementById("pdfProgress").textContent="";}
-
 async function downloadPdf(d){
   const prog=document.getElementById("pdfProgress");
   const btn=document.getElementById("pdfDirect");
   btn.disabled=true;btn.textContent="Generando…";prog.textContent="Preparando…";
   const stamp=new Date().toISOString().slice(0,10);
-  const fullHtml=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><style>${REPORT_CSS} body{padding:20px}</style></head><body>${reportBody(d)}</body></html>`;
-  // Crear contenedor temporal oculto en el documento actual
   const wrapper=document.createElement("div");
   wrapper.style.cssText="position:fixed;left:-9999px;top:0;width:860px;pointer-events:none;";
   wrapper.innerHTML=`<div style="font-family:Inter,system-ui,sans-serif;font-size:13px;line-height:1.5;color:#1A1D1A;background:#fff;padding:20px">${reportBody(d)}</div>`;
@@ -753,7 +831,6 @@ async function downloadPdf(d){
     btn.disabled=false;btn.textContent="⬇ Descargar PDF";
   }
 }
-
 function downloadHtml(d){
   const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reporte — ${esc(d.sede)} — ${d.fecha}</title><style>${REPORT_CSS}</style></head><body>${reportBody(d)}</body></html>`;
   const blob=new Blob([html],{type:"text/html"});
@@ -784,16 +861,11 @@ function toast(msg){const el=document.getElementById("toast");el.textContent=msg
 async function init(){
   let loaded=null;
   try{await initFirebase();loaded=await load();}catch(e){console.error("Inicio falló:",e);}
-  state=loaded||buildDefault();
-  state.talleres.forEach(t=>t.items.forEach(it=>{if(!it.id)it.id=nid();}));
+  const hadBod = !!(loaded&&loaded.talleres&&loaded.talleres.find(t=>t.code==="BOD"));
+  state=migrate(loaded||buildDefault());
 
-  // Migración: agregar BOD si el estado guardado no lo tiene
-  if(!state.talleres.find(t=>t.code==="BOD")){
-    state.talleres.push({code:"BOD",nombre:"Bodega",items:(SEED["BOD"]||[]).map(([eq,spec,std])=>({id:nid(),eq,spec,std,act:null}))});
-    save();
-  }
-
-  if(!loaded&&fb.ready)await storageSet(JSON.stringify(state));
+  // Guardar el estado ya migrado (con Bodega y campos de revisión)
+  if(!loaded || !hadBod){ await storageSet(JSON.stringify(state)); }
 
   document.getElementById("sedeIn").value=state.sede||"";
   document.getElementById("sedeIn").oninput=function(){state.sede=this.value;save();};
@@ -809,7 +881,7 @@ async function init(){
     toast("Datos actualizados");
   };
   document.getElementById("resetBtn").onclick=async()=>{
-    if(!confirm("¿Reiniciar todo? Se borrarán las cantidades actuales y los cambios al estándar."))return;
+    if(!confirm("¿Reiniciar todo? Se borrarán las cantidades actuales, las revisiones y los cambios al estándar."))return;
     state=buildDefault();await storageSet(JSON.stringify(state));
     document.getElementById("sedeIn").value="";document.getElementById("note").style.display="";
     current="500A";setView("talleres");renderTabs();renderPanel();refreshGlobal();toast("Restablecido");
